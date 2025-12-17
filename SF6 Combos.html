@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SF6 TACTICS V14</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Teko:wght@500;600&display=swap');
+        
+        body { 
+            font-family: 'Microsoft JhengHei', 'Microsoft YaHei', sans-serif; 
+            background-color: #0f0f11; 
+            color: #d4d4d8; 
+            overflow-y: scroll;
+        }
+        
+        .mono-font { font-family: 'Roboto Mono', monospace; }
+        .fight-font { font-family: 'Teko', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1a1a1a; }
+        ::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
+        
+        .step-arrow { color: #d946ef; font-weight: bold; margin: 0 6px; user-select: none; }
+        
+        .input-block {
+            background-color: #2d2d2d;
+            border: 1px solid #444;
+            padding: 4px 10px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        .card-preview {
+            background-color: #18181b;
+            border-left: 4px solid #a855f7;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            border-bottom: 1px solid #27272a;
+        }
+        .card-preview:hover {
+            background-color: #202023;
+            transform: translateX(4px);
+            border-left-color: #d946ef;
+        }
+
+        #focusOverlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .focus-container {
+            width: 95%;
+            max-width: 1200px;
+            min-height: 60vh;
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            flex-direction: column; 
+        }
+        @media (min-width: 768px) {
+            .focus-container { flex-direction: row; }
+        }
+
+        .focus-main {
+            flex: 1.2;
+            background-color: #18181b;
+            border: 1px solid #333;
+            border-left: 6px solid #a855f7;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transform: translateX(-50px); 
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .focus-tree {
+            flex: 0.8;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 16px;
+            width: 100%;
+            transform: translateX(50px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.15s;
+        }
+
+        #focusOverlay.show { opacity: 1; }
+        #focusOverlay.show .focus-main { transform: translateX(0); opacity: 1; }
+        #focusOverlay.show .focus-tree { transform: translateX(0); opacity: 1; }
+
+        .tactic-btn {
+            background-color: #27272a;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            color: #e4e4e7;
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .tactic-btn:hover {
+            border-color: #22c55e;
+            background-color: #22c55e1a;
+            transform: translateX(10px);
+            color: #fff;
+        }
+        .tactic-arrow { color: #22c55e; margin-right: 16px; font-weight: bold; font-size: 1.5rem; }
+
+        .delete-btn {
+            position: absolute; top: 8px; right: 8px;
+            color: #555; font-size: 1.5rem; cursor: pointer; z-index: 10;
+            line-height: 1; padding: 4px;
+        }
+        .delete-btn:hover { color: #ef4444; }
+
+        .drive-box { width: 12px; height: 12px; margin-right: 3px; transform: skewX(-15deg); display: inline-block; }
+        .drive-on { background-color: #22c55e; box-shadow: 0 0 5px #22c55e; }
+        .drive-off { background-color: #333; }
+
+        .char-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px; }
+        .char-btn {
+            background-color: #27272a; border: 1px solid #3f3f46; color: #a1a1aa;
+            padding: 24px 0; text-align: center; cursor: pointer; border-radius: 4px;
+        }
+        .char-btn:hover { background-color: #3f3f46; color: #fff; border-color: #d946ef; transform: scale(1.05); }
+        .char-name-display { font-family: 'Teko', sans-serif; font-size: 1.6rem; line-height: 1; letter-spacing: 1px; }
+    </style>
+</head>
+<body class="pb-20">
+
+    <div id="focusOverlay" onclick="closeFocus()">
+        <div class="focus-container" onclick="event.stopPropagation()">
+            <div class="focus-main" id="focusMainContent"></div>
+            <div class="focus-tree" id="focusTreeContent"></div>
+        </div>
+        <div class="absolute bottom-10 text-gray-500 text-sm animate-pulse cursor-pointer hover:text-white">
+            點擊空白處關閉
+        </div>
+    </div>
+
+    <div id="navBar" class="hidden fixed top-0 w-full bg-zinc-900/95 backdrop-blur border-b border-zinc-700 p-3 z-50 flex justify-between items-center shadow-lg">
+        <button onclick="goBackToSelect()" class="text-gray-400 hover:text-white flex items-center text-sm font-bold transition">
+            <span class="mr-1 text-xl">‹</span> 選角
+        </button>
+        <h1 class="text-3xl font-bold text-white fight-font tracking-widest text-shadow" id="navTitle">RYU</h1>
+        <button onclick="toggleBuilder()" id="addBtn" class="bg-purple-700 hover:bg-purple-600 text-white px-4 py-1.5 rounded text-sm font-bold shadow-[0_0_10px_rgba(168,85,247,0.5)] transition">
+            + 紀錄
+        </button>
+    </div>
+
+    <div id="charSelectScreen" class="container mx-auto mt-6 px-2 max-w-2xl animate-[fadeIn_0.5s_ease-out]">
+        <div class="text-center mb-6 sticky top-0 bg-[#0f0f11] z-40 py-4 border-b border-zinc-800">
+            <h1 class="text-5xl text-white fight-font mb-2">CHARACTER SELECT</h1>
+        </div>
+        <div class="char-grid" id="charGrid"></div>
+    </div>
+
+    <div id="contentScreen" class="hidden container mx-auto mt-20 px-4 max-w-md">
+        <div id="builderSection" class="hidden bg-zinc-800 p-5 rounded border border-zinc-600 mb-6 relative shadow-2xl">
+            <h2 class="text-xl mb-4 text-gray-200 border-l-4 border-purple-500 pl-3 font-bold">新對策紀錄</h2>
+            
+            <div id="comboPreview" class="bg-black p-4 rounded min-h-[60px] flex flex-wrap items-center mb-4 border border-zinc-600 text-lg shadow-inner">
+                <span class="text-zinc-500 text-sm" id="emptyHint">輸入指令按 Enter...</span>
+            </div>
+
+            <div class="flex gap-2 mb-4">
+                <input type="text" id="stepInput" class="flex-1 bg-zinc-700 border border-zinc-600 text-white p-3 rounded text-lg outline-none focus:border-purple-500 transition uppercase font-mono placeholder-gray-500" placeholder="如: 2MP">
+            </div>
+
+            <div class="bg-zinc-900 p-3 rounded mb-4 border border-zinc-700">
+                <div class="flex justify-between mb-2 items-center">
+                    <label class="text-base text-blue-400 font-bold">壓起身選項 (多行輸入)</label>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs text-gray-400">有利幀</label>
+                        <input type="text" id="frameInput" class="bg-zinc-800 text-green-400 w-16 text-center text-base border border-zinc-600 rounded font-mono" placeholder="+42">
+                    </div>
+                </div>
+                <textarea id="okiInput" rows="4" class="w-full bg-zinc-800 text-gray-300 text-base p-2 border border-zinc-600 rounded focus:border-blue-500 outline-none leading-relaxed" placeholder="1. 投
+2. Shimmy (打拆投)
+3. 打亂動"></textarea>
+            </div>
+
+            <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
+                <select id="tagSelect" class="bg-zinc-700 text-base p-2 rounded text-white border border-zinc-600 outline-none">
+                    <option value="combo">連段 Combo</option>
+                    <option value="punish">確反 Punish</option>
+                    <option value="setup">詐欺跳 Setup</option>
+                </select>
+                <select id="driveSelect" class="bg-zinc-700 text-base p-2 rounded text-white border border-zinc-600 outline-none">
+                    <option value="0">0 氣</option>
+                    <option value="1">1 氣</option>
+                    <option value="3">3 氣 (DR)</option>
+                    <option value="6">Burnout</option>
+                </select>
+                <input type="number" id="dmgInput" class="bg-zinc-700 text-white w-24 text-base p-2 border border-zinc-600 rounded outline-none" placeholder="傷害">
+            </div>
+
+            <div class="flex gap-3">
+                <button id="saveBtn" class="flex-1 bg-purple-700 hover:bg-purple-600 text-white py-3 rounded text-lg shadow-lg font-bold">儲存筆記</button>
+                <button onclick="toggleBuilder()" class="px-4 text-gray-400 hover:text-white text-lg">取消</button>
+            </div>
+        </div>
+
+        <div id="librarySection">
+            <div id="cardList" class="space-y-4 pb-20">
+                <div id="emptyState" class="text-center text-gray-500 mt-10 hidden">
+                    <p class="text-xl font-bold">尚無筆記</p>
+                    <p class="text-sm mt-2">點擊右上方「+ 紀錄」新增第一筆</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase (雲端儲存) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+        // 你的專案設定
+        const firebaseConfig = {
+          apiKey: "AIzaSyAog6i-mDornqBzLI-81aeXhS_2eP6kx-A",
+          authDomain: "sf6-notes.firebaseapp.com",
+          projectId: "sf6-notes",
+          storageBucket: "sf6-notes.firebasestorage.app",
+          messagingSenderId: "832506018972",
+          appId: "1:832506018972:web:428aaef84a1aa802d40159",
+          measurementId: "G-39RZ6VTXZ7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // ===== JS 主程式 =====
+        let currentCharacter = ""; 
+        let allNotes = [];
+        let currentSteps = [];
+        let characters = [
+            "A.K.I.", "BLANKA", "C.VIPER", "CAMMY", "CHUN-LI", 
+            "DEE JAY", "DHALSIM", "E.HONDA", "ED", "ELENA", 
+            "GOUKI", "GUILE", "JAMIE", "JP", "JURI", 
+            "KEN", "KIMBERLY", "LILY", "LUKE", "MAI", 
+            "MANON", "MARISA", "RASHID", "RYU", "TERRY", 
+            "VEGA", "ZANGIEF"
+        ];
+        characters.sort();
+
+        window.selectCharacter = async function(name) {
+            currentCharacter = name;
+            document.getElementById('charSelectScreen').classList.add('hidden');
+            document.getElementById('contentScreen').classList.remove('hidden');
+            document.getElementById('navBar').classList.remove('hidden');
+            document.getElementById('navTitle').innerText = name;
+            await loadNotesFromCloud();
+        };
+
+        window.goBackToSelect = function() {
+            document.getElementById('contentScreen').classList.add('hidden');
+            document.getElementById('navBar').classList.add('hidden');
+            document.getElementById('charSelectScreen').classList.remove('hidden');
+            document.getElementById('builderSection').classList.add('hidden');
+            document.getElementById('addBtn').classList.remove('hidden');
+        };
+
+        window.openFocus = function(id) {
+            const note = allNotes.find(n => n.id === id);
+            if (!note) return;
+
+            const overlay = document.getElementById('focusOverlay');
+            const main = document.getElementById('focusMainContent');
+            const tree = document.getElementById('focusTreeContent');
+            
+            let driveHtml = '';
+            for(let i=0; i<6; i++) driveHtml += `<span class="drive-box ${i < note.drive ? 'drive-on' : 'drive-off'}"></span>`;
+            
+            let flowHtml = note.steps.map((step, idx) => {
+                let style = "bg-zinc-700 px-3 py-1 rounded mx-1 text-3xl"; 
+                if (['DR', 'PC', 'DI', 'OD'].includes(step)) style = "text-green-400 font-bold text-3xl mx-1";
+                else if (step.includes('SA')) style = "text-red-400 font-bold text-3xl mx-1";
+                return `<span class="${style} inline-block mb-3">${step}</span>` + (idx < note.steps.length-1 ? `<span class="step-arrow text-3xl">➜</span>` : '');
+            }).join('');
+
+            main.innerHTML = `
+                <div class="flex justify-between items-end border-b border-gray-700 pb-4 mb-6">
+                    <div>
+                        <div class="text-sm text-gray-400 mb-1">DRIVE COST</div>
+                        <div>${driveHtml}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm text-gray-400">DAMAGE</div>
+                        <div class="text-5xl font-bold text-white mono-font">${note.dmg}</div>
+                    </div>
+                </div>
+                <div class="text-white mono-font leading-relaxed mb-6 text-xl">${flowHtml}</div>
+                <div class="flex items-center gap-3">
+                    <span class="bg-blue-900/30 text-blue-400 border border-blue-900 px-4 py-2 rounded font-bold mono-font text-2xl">+${note.frame}F</span>
+                    <span class="text-gray-500 text-sm tracking-widest">ADVANTAGE</span>
+                </div>
+            `;
+
+            const okiLines = note.okiRaw.split('\n').filter(l => l.trim() !== "");
+            if (okiLines.length > 0) {
+                tree.innerHTML = okiLines.map(line => `
+                    <div class="tactic-btn">
+                        <span class="tactic-arrow">➜</span>
+                        <span>${line}</span>
+                    </div>
+                `).join('');
+            } else {
+                tree.innerHTML = `<div class="text-gray-500 text-center text-xl">無後續設定</div>`;
+            }
+
+            overlay.style.display = 'flex';
+            setTimeout(() => { overlay.classList.add('show'); }, 10);
+        };
+
+        window.closeFocus = function() {
+            const overlay = document.getElementById('focusOverlay');
+            overlay.classList.remove('show');
+            setTimeout(() => { overlay.style.display = 'none'; }, 300);
+        };
+
+        window.deleteCard = async function(event, id) {
+            event.stopPropagation();
+            if (!confirm("確定刪除？")) return;
+            const note = allNotes.find(n => n.id === id);
+            if (!note) return;
+            if (note.docId) {
+                await deleteDoc(doc(db, "notes", note.docId));
+            }
+            allNotes = allNotes.filter(n => n.id !== id);
+            renderNotes();
+        };
+
+        window.toggleBuilder = function() {
+            const builder = document.getElementById('builderSection');
+            const btn = document.getElementById('addBtn');
+            if (builder.classList.contains('hidden')) { 
+                builder.classList.remove('hidden'); 
+                btn.classList.add('hidden'); 
+                document.getElementById('stepInput').focus(); 
+            } else { 
+                builder.classList.add('hidden'); 
+                btn.classList.remove('hidden'); 
+            }
+        };
+
+        function renderCharGrid(list) {
+            const grid = document.getElementById('charGrid');
+            grid.innerHTML = list.map(name => `
+                <div class="char-btn" onclick="selectCharacter('${name}')">
+                    <span class="char-name-display">${name}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderNotes() {
+            const list = document.getElementById('cardList');
+            const charNotes = allNotes.filter(n => n.char === currentCharacter);
+            
+            if (charNotes.length === 0) {
+                list.innerHTML = ""; 
+                document.getElementById('emptyState').classList.remove('hidden'); 
+                return;
+            }
+            document.getElementById('emptyState').classList.add('hidden');
+
+            list.innerHTML = [...charNotes].reverse().map(note => {
+                let typeLabel = "連段", typeColor = "text-blue-200 border-blue-700 bg-blue-900/50";
+                if(note.type === 'punish') { typeLabel = "確反"; typeColor = "text-red-200 border-red-700 bg-red-900/50"; }
+                if(note.type === 'setup') { typeLabel = "詐欺跳"; typeColor = "text-yellow-200 border-yellow-700 bg-yellow-900/50"; }
+
+                let flowHtml = note.steps.map((step, idx) => {
+                    let style = "bg-zinc-700 px-1 rounded";
+                    if (['DR', 'PC', 'DI', 'OD'].includes(step)) style = "text-green-400 font-bold";
+                    else if (step.includes('SA')) style = "text-red-400 font-bold";
+                    return `<span class="${style}">${step}</span>` + (idx < note.steps.length-1 ? `<span class="step-arrow">➜</span>` : '');
+                }).join('');
+
+                return `
+                    <div class="card-preview group" onclick="openFocus(${note.id})">
+                        <div class="delete-btn" onclick="deleteCard(event, ${note.id})">×</div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="${typeColor} text-xs px-2 py-0.5 rounded border font-bold">${typeLabel}</span>
+                            <div class="text-right">
+                                <div class="text-xs text-gray-500">Damage</div>
+                                <div class="text-xl font-bold text-white leading-none mono-font">${note.dmg}</div>
+                            </div>
+                        </div>
+                        <div class="text-base mono-font text-gray-300 truncate">${flowHtml}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function loadNotesFromCloud() {
+            allNotes = [];
+            const q = query(collection(db, "notes"), where("char", "==", currentCharacter));
+            const snap = await getDocs(q);
+            snap.forEach(docSnap => {
+                const data = docSnap.data();
+                allNotes.push({
+                    id: data.id,
+                    docId: docSnap.id,
+                    ...data
+                });
+            });
+            renderNotes();
+        }
+
+        async function saveCardToCloud(noteObj) {
+            const docRef = await addDoc(collection(db, "notes"), noteObj);
+            return docRef.id;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            renderCharGrid(characters);
+
+            const previewDiv = document.getElementById('comboPreview');
+            const input = document.getElementById('stepInput');
+            const saveBtn = document.getElementById('saveBtn');
+
+            function renderPreview() {
+                if (currentSteps.length === 0) {
+                    previewDiv.innerHTML = '<span class="text-zinc-500 text-sm">輸入指令按 Enter...</span>';
+                    return;
+                }
+                previewDiv.innerHTML = currentSteps.map((step, idx) => {
+                    let style = "bg-zinc-700";
+                    if (['DR', 'PC', 'DI', 'OD'].includes(step)) style = "bg-green-900 text-green-300 border border-green-700";
+                    else if (step.includes('SA')) style = "bg-red-900 text-red-200 border border-red-700";
+                    return `<span class="input-block ${style}">${step}</span>` + (idx < currentSteps.length-1 ? `<span class="step-arrow">➜</span>` : '');
+                }).join('');
+            }
+
+            input.addEventListener('input', function() { this.value = this.value.toUpperCase(); });
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && this.value.trim() !== "") {
+                    currentSteps.push(this.value.trim().toUpperCase());
+                    this.value = ""; 
+                    renderPreview();
+                }
+            });
+
+            saveBtn.addEventListener('click', async function() {
+                if (currentSteps.length === 0) {
+                    alert("請輸入連段！");
+                    return;
+                }
+                const note = {
+                    id: Date.now(),
+                    char: currentCharacter,
+                    steps: [...currentSteps],
+                    okiRaw: document.getElementById('okiInput').value,
+                    frame: document.getElementById('frameInput').value || "?",
+                    dmg: document.getElementById('dmgInput').value || "0",
+                    type: document.getElementById('tagSelect').value,
+                    drive: document.getElementById('driveSelect').value
+                };
+                const docId = await saveCardToCloud(note);
+                note.docId = docId;
+                allNotes.push(note);
+
+                currentSteps = [];
+                document.getElementById('stepInput').value = "";
+                document.getElementById('okiInput').value = "";
+                document.getElementById('dmgInput').value = "";
+                document.getElementById('frameInput').value = "";
+                renderPreview();
+                toggleBuilder();
+                renderNotes();
+            });
+        });
+    </script>
+</body>
+</html>
