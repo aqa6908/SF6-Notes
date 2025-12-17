@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SF6 TACTICS V14</title>
+    <title>SF6 TACTICS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&display=swap');
@@ -38,10 +38,10 @@
             background-color: #18181b;
             border-left: 4px solid #a855f7;
             border-radius: 6px;
-            padding: 16px 16px 12px;
-            margin-bottom: 12px;
+            padding: 12px 14px 10px;
+            margin-bottom: 10px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.18s;
             position: relative;
             border-bottom: 1px solid #27272a;
         }
@@ -182,7 +182,7 @@
             <span class="mr-1 text-xl">‹</span> 選角
         </button>
         <h1 class="text-3xl font-bold text-white fight-font tracking-widest text-shadow" id="navTitle">RYU</h1>
-        <button onclick="toggleBuilder()" id="addBtn" class="bg-purple-700 hover:bg-purple-600 text-white px-4 py-1.5 rounded text-sm font-bold shadow-[0_0_10px_rgba(168,85,247,0.5)] transition">
+        <button onclick="openBuilder()" id="addBtn" class="bg-purple-700 hover:bg-purple-600 text-white px-4 py-1.5 rounded text-sm font-bold shadow-[0_0_10px_rgba(168,85,247,0.5)] transition">
             + 紀錄
         </button>
     </div>
@@ -279,7 +279,7 @@
                   <button id="saveBtn" class="flex-1 bg-purple-700 hover:bg-purple-600 text-white py-2.5 rounded text-sm shadow-lg font-bold">
                       儲存筆記
                   </button>
-                  <button onclick="toggleBuilder()" class="px-4 text-gray-300 hover:text-white text-sm">
+                  <button onclick="closeBuilder()" class="px-4 text-gray-300 hover:text-white text-sm">
                       取消
                   </button>
               </div>
@@ -454,6 +454,7 @@
             cardList.innerHTML = [...charNotes].reverse().map(note => {
                 const pLabel = primaryTagLabel(note.primaryTag);
                 const extras = Array.isArray(note.extraTags) ? note.extraTags : [];
+                const driveVal = Number(note.drive) || 0;
 
                 let tagHtml = '';
                 if (pLabel) {
@@ -472,25 +473,21 @@
                            (idx < note.steps.length-1 ? `<span class="step-arrow text-xs">➜</span>` : '');
                 }).join('');
 
-                const driveVal = Number(note.drive) || 0;
-
                 return `
                     <div class="card-preview group" onclick="openFocus(${note.id})">
                         <div class="delete-btn" onclick="deleteCard(event, ${note.id})">×</div>
-                        <div class="flex justify-between items-start mb-2 pt-4">
-                            <div class="flex-1 pr-2">
+                        <div class="flex justify-between items-start gap-3 mb-1 pt-4">
+                            <div class="flex-1 min-w-0">
                                 <div class="mb-1">${tagHtml}</div>
+                                <div class="text-xs text-zinc-400 mono-font truncate">${flowHtml}</div>
                             </div>
-                            <div class="text-right">
-                                <div class="text-[10px] text-gray-500 uppercase">Damage</div>
-                                <div class="text-xl font-bold text-white leading-none mono-font mt-0.5">${note.dmg}</div>
-                                <div class="mt-1">
-                                  <span class="text-[10px] text-gray-500 uppercase mr-1">Drive</span>
-                                  <span class="text-sm text-emerald-300 mono-font">${driveVal}</span>
-                                </div>
+                            <div class="flex flex-col items-end text-right">
+                                <div class="text-[10px] text-gray-500 uppercase">DAMAGE</div>
+                                <div class="text-xl font-bold text-white leading-none mono-font mt-0.5 mb-1">${note.dmg}</div>
+                                <div class="text-[10px] text-gray-500 uppercase">DRIVE</div>
+                                <div class="text-sm text-emerald-300 mono-font">${driveVal}</div>
                             </div>
                         </div>
-                        <div class="text-sm mono-font text-gray-300 truncate">${flowHtml}</div>
                     </div>
                 `;
             }).join('');
@@ -529,8 +526,7 @@
             document.getElementById('contentScreen').classList.add('hidden');
             document.getElementById('navBar').classList.add('hidden');
             document.getElementById('charSelectScreen').classList.remove('hidden');
-            document.getElementById('builderSection').classList.add('hidden');
-            document.getElementById('addBtn').classList.remove('hidden');
+            closeBuilder();
         };
 
         window.openFocus = function(id) {
@@ -636,18 +632,23 @@
             }
         });
 
-        window.toggleBuilder = function() {
+        function openBuilder() {
             const builder = document.getElementById('builderSection');
             const btn = document.getElementById('addBtn');
-            if (builder.classList.contains('hidden')) { 
-                builder.classList.remove('hidden'); 
-                btn.classList.add('hidden'); 
-                stepInput.focus(); 
-            } else { 
-                builder.classList.add('hidden'); 
-                btn.classList.remove('hidden'); 
-            }
-        };
+            builder.classList.remove('hidden');
+            btn.classList.add('hidden');
+            stepInput.focus();
+        }
+
+        function closeBuilder() {
+            const builder = document.getElementById('builderSection');
+            const btn = document.getElementById('addBtn');
+            builder.classList.add('hidden');
+            btn.classList.remove('hidden');
+        }
+
+        window.openBuilder = openBuilder;
+        window.closeBuilder = closeBuilder;
 
         renderCharGrid(characters);
         renderPreview();
@@ -737,6 +738,7 @@
             allNotes.push(note);
             renderNotes();
 
+            // 清空狀態
             currentSteps = [];
             currentOkiOptions = [];
             primaryTag = null;
@@ -751,11 +753,8 @@
             primaryButtons.forEach(b => b.classList.remove('border-purple-400','bg-purple-900/40','text-purple-100'));
             extraButtons.forEach(b => b.classList.remove('ring-1','ring-offset-1','ring-offset-zinc-900'));
 
-            // 5. 確保儲存後 builder 關閉
-            const builder = document.getElementById('builderSection');
-            if (builder && !builder.classList.contains('hidden')) {
-                toggleBuilder();
-            }
+            // 3. 儲存後直接關閉 Combos 區塊
+            closeBuilder();
 
             try {
                 const docId = await saveCardToCloud(note);
