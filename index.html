@@ -27,10 +27,10 @@
         
         /* 統一比例後的輸入框樣式 */
         .input-field {
-            border-radius: 6px;
+            border-radius: 8px;
             font-family: 'Roboto Mono', monospace;
-            font-size: 0.95rem; /* 稍微縮小字體以配合框 */
-            padding: 8px 12px; /* 統一內邊距 */
+            font-size: 1rem;
+            padding: 10px 14px;
             border: 2px solid #4b5563;
             transition: all 0.2s ease;
             background: linear-gradient(145deg, #0f0f23, #15152b);
@@ -48,17 +48,28 @@
             background: linear-gradient(135deg, rgba(55, 65, 81, 0.6) 0%, rgba(31, 41, 55, 0.8) 100%);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(75, 85, 99, 0.4);
-            border-radius: 6px;
-            padding: 6px 10px; /* 增加上下間距讓比例和諧 */
+            border-radius: 8px;
+            padding: 8px 12px;
             font-family: 'Roboto Mono', monospace;
-            font-size: 0.9rem;
+            font-size: 1rem;
             display: inline-flex;
             align-items: center;
             line-height: 1.2;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            margin: 2px 4px 2px 0;
         }
 
-        /* 卡片與 X 按鈕修正 */
+        /* 區塊統一樣式 (Builder Section) */
+        .builder-block {
+            background: rgba(24, 24, 27, 0.6); /* zinc-900/60 */
+            border: 1px solid #71717a; /* zinc-500 */
+            border-radius: 12px; /* xl */
+            padding: 20px;
+            position: relative;
+            backdrop-filter: blur(4px);
+        }
+
+        /* 卡片與 X 按鈕 */
         .card-preview {
             background: linear-gradient(135deg, #1e1e2e 0%, #2d2d3d 100%);
             border: 1px solid #404046;
@@ -71,10 +82,10 @@
             position: relative;
             overflow: hidden;
             box-shadow: 0 6px 24px rgba(0,0,0,0.4);
-            min-height: 110px;
+            min-height: 120px;
         }
         
-        /* X 按鈕：移至右上角並避開數據區 */
+        /* X 按鈕：維持在右上角並避開數據區 */
         .card-preview .delete-btn {
             position: absolute;
             top: 8px;
@@ -83,8 +94,8 @@
             border: 1px solid rgba(239, 68, 68, 0.4);
             color: #ef4444;
             font-size: 1.1rem;
-            width: 26px;
-            height: 26px;
+            width: 28px;
+            height: 28px;
             border-radius: 6px;
             display: flex;
             align-items: center;
@@ -100,15 +111,15 @@
             transform: scale(1.1);
         }
 
-        /* 數據區維持在右側中間 */
+        /* 數據區 */
         .card-stats {
             background: rgba(17, 24, 39, 0.8);
             backdrop-filter: blur(10px);
             border: 1px solid #374151;
             border-radius: 8px;
-            padding: 8px;
+            padding: 10px;
             text-align: center;
-            width: 85px;
+            width: 90px;
             position: absolute;
             top: 50%;
             right: 16px;
@@ -118,15 +129,16 @@
 
         /* 預覽容器統一比例 */
         .preview-container {
-            background: rgba(15, 15, 25, 0.6);
-            border: 1px solid rgba(75, 85, 99, 0.5);
-            border-radius: 8px;
-            padding: 12px;
-            min-height: 60px;
+            background: linear-gradient(to right, rgba(39, 39, 42, 0.8), rgba(24, 24, 27, 0.8));
+            border: 1px solid rgba(82, 82, 91, 0.5);
+            border-radius: 12px;
+            padding: 16px;
+            min-height: 70px;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             gap: 8px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
         }
 
         #focusOverlay {
@@ -145,6 +157,7 @@
         .focus-container {
             width: 95%;
             max-width: 1200px;
+            min-height: 60vh;
             display: flex;
             gap: 40px;
             align-items: center;
@@ -159,18 +172,35 @@
             border-left: 6px solid #a855f7;
             padding: 40px;
             border-radius: 14px;
+            box-shadow: 0 0 60px rgba(0,0,0,0.9);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .focus-tree {
+            flex: 0.8;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 16px;
             width: 100%;
         }
 
+        /* 還原舊版樹狀圖樣式 */
         .tactic-btn {
             background-color: #27272a;
-            padding: 14px;
+            padding: 16px;
             border-radius: 8px;
             border: 1px solid #444;
             color: #e4e4e7;
             display: flex;
             align-items: center;
+            font-size: 1.05rem;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.3);
         }
+        .tactic-arrow { color: #22c55e; margin-right: 16px; font-weight: bold; font-size: 1.3rem; }
 
         .drive-box { width: 12px; height: 12px; margin-right: 3px; transform: skewX(-15deg); display: inline-block; }
         .drive-on { background-color: #22c55e; box-shadow: 0 0 5px #22c55e; }
@@ -179,18 +209,44 @@
         .char-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px; }
         .char-btn {
             background-color: #27272a; border: 1px solid #3f3f46; color: #a1a1aa;
-            padding: 20px 0; text-align: center; cursor:pointer; border-radius:4px;
+            padding: 24px 0; text-align: center; cursor:pointer; border-radius:4px;
         }
         .char-btn:hover { background-color:#3f3f46;color:#fff;border-color:#d946ef;transform:scale(1.05);}
+        .char-name-display { font-family:'Teko',sans-serif;font-size:1.6rem;line-height:1;letter-spacing:1px;}
 
         .builder-shell {
-            background-image: linear-gradient(to right, rgba(63,63,70,0.2) 1px, transparent 1px), linear-gradient(to bottom, rgba(63,63,70,0.2) 1px, transparent 1px);
-            background-size: 20px 20px;
+            background-image: linear-gradient(to right, rgba(63,63,70,0.25) 1px, transparent 1px), linear-gradient(to bottom, rgba(63,63,70,0.25) 1px, transparent 1px);
+            background-size: 24px 24px;
             background-color: #020617;
         }
 
-        .card-tag-primary { background: linear-gradient(135deg, #9333ea, #a855f7); color: white; padding: 4px 10px; border-radius: 12px; font-weight: 600; font-size: 0.75rem; }
-        .card-tag-extra { background: rgba(107, 114, 128, 0.3); color: #d1d5db; padding: 3px 8px; border-radius: 10px; font-size: 0.7rem; border: 1px solid #6b7280; }
+        /* 標籤置中對齊 */
+        .card-tag-primary, .card-tag-extra {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin: 2px;
+        }
+        .card-tag-primary {
+            background: linear-gradient(135deg, #9333ea, #a855f7);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 6px rgba(147, 51, 234, 0.3);
+            min-width: 60px;
+        }
+        .card-tag-extra {
+            background: rgba(107, 114, 128, 0.3);
+            color: #d1d5db;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            border: 1px solid #6b7280;
+            min-width: 48px;
+        }
     </style>
 </head>
 <body class="pb-20">
@@ -200,20 +256,23 @@
             <div class="focus-main" id="focusMainContent"></div>
             <div class="focus-tree" id="focusTreeContent"></div>
         </div>
+        <div class="absolute bottom-8 text-gray-500 text-xs animate-pulse cursor-pointer hover:text-white">
+            點擊空白處關閉 / ESC
+        </div>
     </div>
 
-    <div id="navBar" class="hidden fixed top-0 w-full bg-zinc-900/95 backdrop-blur border-b border-zinc-700 p-3 z-50 flex justify-between items-center">
-        <button onclick="goBackToSelect()" class="text-gray-400 hover:text-white flex items-center text-sm font-bold">
+    <div id="navBar" class="hidden fixed top-0 w-full bg-zinc-900/95 backdrop-blur border-b border-zinc-700 p-3 z-50 flex justify-between items-center shadow-lg">
+        <button onclick="goBackToSelect()" class="text-gray-400 hover:text-white flex items-center text-sm font-bold transition">
             <span class="mr-1 text-xl">‹</span> 選角
         </button>
-        <h1 class="text-3xl font-bold text-white fight-font tracking-widest" id="navTitle">RYU</h1>
-        <button onclick="openBuilder()" id="addBtn" class="bg-purple-700 hover:bg-purple-600 text-white px-4 py-1.5 rounded text-sm font-bold transition">
+        <h1 class="text-3xl font-bold text-white fight-font tracking-widest text-shadow" id="navTitle">RYU</h1>
+        <button onclick="openBuilder()" id="addBtn" class="bg-purple-700 hover:bg-purple-600 text-white px-4 py-1.5 rounded text-sm font-bold shadow-[0_0_10px_rgba(168,85,247,0.5)] transition">
             + 紀錄
         </button>
     </div>
 
-    <div id="charSelectScreen" class="container mx-auto mt-6 px-2 max-w-2xl">
-        <div class="text-center mb-6 py-4 border-b border-zinc-800">
+    <div id="charSelectScreen" class="container mx-auto mt-6 px-2 max-w-2xl animate-[fadeIn_0.5s_ease-out]">
+        <div class="text-center mb-6 sticky top-0 bg-[#050509] z-40 py-4 border-b border-zinc-800">
             <h1 class="text-5xl text-white fight-font mb-2">CHARACTER SELECT</h1>
         </div>
         <div class="char-grid" id="charGrid"></div>
@@ -223,66 +282,83 @@
         <div id="builderSection" class="hidden mb-6 relative">
           <div class="builder-shell rounded-xl border border-zinc-700 shadow-2xl overflow-hidden">
             <div class="border-b border-zinc-700 px-5 py-3 flex items-center justify-between bg-zinc-950/70">
-              <h2 class="text-sm text-purple-100 font-bold uppercase tracking-wider">Combo Builder</h2>
-              <span class="text-[10px] text-zinc-500">NEW ENTRY</span>
+              <h2 class="text-lg text-purple-100 font-bold flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.8)]"></span>
+                Combos
+              </h2>
+              <span class="text-[10px] uppercase tracking-[0.2em] text-zinc-500">BUILDER</span>
             </div>
 
-            <div class="p-5 space-y-4 bg-zinc-950/80">
-              <div class="space-y-2">
-                <div class="flex justify-between items-center">
-                    <label class="text-xs text-purple-200 font-semibold">連段步驟</label>
-                    <span class="text-[10px] text-zinc-500">ENTER 新增 · BACKSPACE 刪除</span>
+            <div class="p-5 space-y-5 bg-zinc-950/80">
+              <div class="builder-block">
+                <div class="flex justify-between items-center mb-3">
+                    <label class="text-sm text-purple-200 font-semibold tracking-wide">連段步驟</label>
+                    <span class="text-xs text-zinc-400">Enter 新增 · Backspace 刪除</span>
                 </div>
-                <div id="comboPreview" class="preview-container">
+                <div id="comboPreview" class="preview-container mb-3">
                     <span class="text-zinc-500 text-sm">輸入指令後顯示於此...</span>
                 </div>
                 <input type="text" id="stepInput" class="input-field" placeholder="例如: 2MP, 5HP, DRC...">
               </div>
 
-              <div class="space-y-2">
-                <div class="flex justify-between items-center">
-                    <label class="text-xs text-blue-200 font-semibold">壓起身選項</label>
-                    <div class="flex items-center gap-2">
-                        <span class="text-[10px] text-zinc-400">有利幀</span>
-                        <input type="text" id="frameInput" class="input-field !w-16 !py-1 !px-2 text-center text-green-300" placeholder="+42">
+              <div class="builder-block">
+                <div class="flex justify-between items-center mb-3">
+                    <label class="text-sm text-blue-200 font-semibold tracking-wide">壓起身選項</label>
+                    <div class="flex items-center gap-3">
+                        <label class="text-xs text-gray-300">有利幀</label>
+                        <input type="text" id="frameInput" class="input-field !w-20 !py-1 !px-2 text-center text-green-300" placeholder="+42">
                     </div>
                 </div>
-                <div id="okiPreview" class="preview-container !min-h-[50px]">
+                <div id="okiPreview" class="preview-container mb-3">
                     <span class="text-zinc-500 text-sm">點擊 Enter 增加選項...</span>
                 </div>
                 <input type="text" id="okiStepInput" class="input-field" placeholder="例如: 投, Shimmy...">
               </div>
 
-              <div class="bg-zinc-900/50 p-4 rounded-lg space-y-4 border border-zinc-800">
-                <div class="flex gap-4 items-end">
-                    <div class="flex-1">
-                        <label class="text-xs text-rose-200 block mb-1">傷害數值</label>
-                        <input type="number" id="dmgInput" class="input-field" placeholder="2500">
+              <div class="builder-block">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1 mr-4">
+                        <div class="flex items-center justify-between mb-2">
+                             <label class="text-sm text-rose-200 font-semibold tracking-wide">傷害數值</label>
+                        </div>
+                        <input type="number" id="dmgInput" class="input-field text-rose-100" placeholder="例如 2,500">
                     </div>
                     <div class="text-right">
-                        <label class="text-xs text-emerald-200 block mb-1">鬥氣消耗</label>
-                        <div id="driveDisplay" class="text-xl font-bold text-emerald-400 font-mono bg-zinc-950 px-4 py-1.5 rounded border border-emerald-900/50">0</div>
+                        <label class="text-sm text-emerald-200 font-semibold tracking-wide block mb-2">鬥氣消耗</label>
+                        <div class="flex items-center justify-end gap-3">
+                            <span id="driveDisplay" class="input-field text-emerald-300 w-16 text-center font-bold bg-gradient-to-r from-emerald-900/30 to-emerald-900/50 border-emerald-500/50">
+                              0
+                            </span>
+                        </div>
                     </div>
-                </div>
-
-                <div>
-                  <label class="text-xs text-zinc-400 block mb-2">標籤分類</label>
-                  <div class="flex flex-wrap gap-2 mb-2">
-                    <button data-tag-primary="light"  class="tag-primary px-3 py-1.5 text-xs rounded-md border border-zinc-700 text-zinc-300 bg-zinc-800">輕起始</button>
-                    <button data-tag-primary="medium" class="tag-primary px-3 py-1.5 text-xs rounded-md border border-zinc-700 text-zinc-300 bg-zinc-800">中起始</button>
-                    <button data-tag-primary="heavy"  class="tag-primary px-3 py-1.5 text-xs rounded-md border border-zinc-700 text-zinc-300 bg-zinc-800">重起始</button>
-                  </div>
-                  <div class="flex flex-wrap gap-2">
-                    <button data-tag-extra="corner" class="tag-extra px-3 py-1 text-[10px] rounded-md border border-zinc-700 text-amber-500">版邊</button>
-                    <button data-tag-extra="punish" class="tag-extra px-3 py-1 text-[10px] rounded-md border border-zinc-700 text-red-500">確反</button>
-                    <button data-tag-extra="kill"   class="tag-extra px-3 py-1 text-[10px] rounded-md border border-zinc-700 text-emerald-500">斬殺</button>
-                  </div>
                 </div>
               </div>
 
-              <div class="flex gap-2 pt-2">
-                  <button id="saveBtn" class="flex-1 bg-purple-700 hover:bg-purple-600 text-white py-3 rounded-lg text-sm font-bold">儲存筆記</button>
-                  <button onclick="closeBuilder()" class="px-6 text-zinc-400 hover:text-white text-sm py-3 rounded-lg border border-zinc-700">取消</button>
+              <div class="builder-block">
+                <div class="flex justify-between items-center mb-3">
+                   <label class="text-sm text-purple-200 font-semibold tracking-wide">標籤分類</label>
+                   <span class="text-xs text-zinc-400">輕/中/重 擇一 · 其他可多選</span>
+                </div>
+                
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <button data-tag-primary="light"  class="tag-primary px-4 py-2 text-sm rounded-full border border-zinc-600 text-zinc-100 bg-zinc-900/50 hover:border-purple-400 hover:bg-purple-900/30 transition-all">輕起始</button>
+                    <button data-tag-primary="medium" class="tag-primary px-4 py-2 text-sm rounded-full border border-zinc-600 text-zinc-100 bg-zinc-900/50 hover:border-purple-400 hover:bg-purple-900/30 transition-all">中起始</button>
+                    <button data-tag-primary="heavy"  class="tag-primary px-4 py-2 text-sm rounded-full border border-zinc-600 text-zinc-100 bg-zinc-900/50 hover:border-purple-400 hover:bg-purple-900/30 transition-all">重起始</button>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button data-tag-extra="corner" class="tag-extra px-3 py-2 text-xs rounded-full border border-zinc-700 text-amber-200 bg-amber-900/30 hover:border-amber-400 hover:bg-amber-900/50 transition-all">版邊限定</button>
+                    <button data-tag-extra="punish" class="tag-extra px-3 py-2 text-xs rounded-full border border-zinc-700 text-red-200 bg-red-900/30 hover:border-red-400 hover:bg-red-900/50 transition-all">確反</button>
+                    <button data-tag-extra="kill"   class="tag-extra px-3 py-2 text-xs rounded-full border border-zinc-700 text-emerald-200 bg-emerald-900/30 hover:border-emerald-400 hover:bg-emerald-900/50 transition-all">斬殺</button>
+                </div>
+              </div>
+
+              <div class="flex gap-3 pt-2">
+                  <button id="saveBtn" class="flex-1 bg-gradient-to-r from-purple-700 to-purple-600 hover:from-purple-600 hover:to-purple-500 text-white py-3 rounded-xl text-sm shadow-xl font-bold transition-all transform hover:scale-[1.02]">
+                      儲存筆記
+                  </button>
+                  <button onclick="closeBuilder()" class="px-6 text-gray-300 hover:text-white text-sm py-3 rounded-xl border border-zinc-600 hover:border-zinc-400 transition-all">
+                      取消
+                  </button>
               </div>
             </div>
           </div>
@@ -293,19 +369,18 @@
         </div>
     </div>
 
-    <div id="deleteModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
-      <div class="bg-zinc-900 border border-zinc-700 rounded-xl w-72 p-6">
-        <h3 class="text-lg font-bold text-red-400 mb-2">刪除連段？</h3>
-        <p class="text-xs text-zinc-400 mb-6">此動作無法復原。</p>
+    <div id="deleteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+      <div class="bg-zinc-900 border border-zinc-700 rounded-xl w-80 p-6 shadow-2xl">
+        <h3 class="text-xl font-bold text-red-400 mb-3">刪除連段？</h3>
+        <p class="text-sm text-gray-300 mb-5">這個連段會從清單中永久移除，無法復原。</p>
         <div class="flex justify-end gap-3">
-          <button id="cancelDeleteBtn" class="px-4 py-2 text-xs text-zinc-400">取消</button>
-          <button id="confirmDeleteBtn" class="px-4 py-2 text-xs bg-red-600 text-white rounded">確認</button>
+          <button id="cancelDeleteBtn" class="px-4 py-2 text-sm rounded-lg border border-zinc-600 text-gray-300 hover:bg-zinc-700 transition-all">取消</button>
+          <button id="confirmDeleteBtn" class="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-500 shadow-lg transition-all">確定刪除</button>
         </div>
       </div>
     </div>
 
     <script type="module">
-        // [Firebase 邏輯與原有 JS 邏輯保持不變，確保功能完整]
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
@@ -345,13 +420,32 @@
         const extraButtons   = document.querySelectorAll('[data-tag-extra]');
         let pendingDeleteId = null;
 
+        // 千分位格式化 Helper
+        const formatNumber = (num) => {
+            return Number(num).toLocaleString('en-US');
+        };
+
         function getStepStyle(step) {
             const upper = step.toUpperCase();
-            if (upper === 'DRC') return 'display-block bg-green-900/50 text-green-200 border-green-500/50';
-            if (upper === 'DR') return 'display-block bg-green-800/30 text-green-200 border-green-700/50';
-            if (upper.includes('SA')) return 'display-block bg-sky-900/50 text-sky-200 border-sky-500/50';
-            if (upper.includes('PP') || upper.includes('KK')) return 'display-block bg-amber-900/50 text-amber-200 border-amber-500/50';
-            return 'display-block bg-zinc-800 text-white border-zinc-600';
+            if (upper === 'DRC') return 'display-block bg-gradient-to-r from-green-900/70 to-green-800/70 text-green-200 border border-green-500/60 shadow-green-500/30';
+            if (upper === 'DR') return 'display-block bg-gradient-to-r from-green-900/60 to-green-800/60 text-green-200 border border-green-500/50 shadow-green-500/25';
+            if (upper.includes('SA')) return 'display-block bg-gradient-to-r from-sky-900/70 to-sky-800/70 text-sky-200 border border-sky-500/60 shadow-sky-500/30';
+            if (upper.includes('PP') || upper.includes('KK')) return 'display-block bg-gradient-to-r from-amber-900/70 to-amber-800/70 text-amber-200 border border-amber-500/60 shadow-amber-500/30';
+            return 'display-block bg-gradient-to-r from-zinc-700/70 to-zinc-600/70 text-white border border-zinc-500/60 shadow-zinc-500/30';
+        }
+
+        function primaryTagLabel(tag) {
+            if (tag === 'light') return '輕起始';
+            if (tag === 'medium') return '中起始';
+            if (tag === 'heavy') return '重起始';
+            return null;
+        }
+
+        function extraTagLabel(tag) {
+            if (tag === 'corner') return '版邊限定';
+            if (tag === 'punish') return '確反';
+            if (tag === 'kill') return '斬殺';
+            return tag;
         }
 
         function computeDriveCost(steps) {
@@ -368,7 +462,7 @@
         function renderCharGrid(list) {
             document.getElementById('charGrid').innerHTML = list.map(name => `
                 <div class="char-btn" onclick="selectCharacter('${name}')">
-                    <span class="fight-font text-2xl">${name}</span>
+                    <span class="char-name-display">${name}</span>
                 </div>
             `).join('');
         }
@@ -381,7 +475,7 @@
             }
             previewDiv.innerHTML = currentSteps.map((step, idx) => {
                 return `<span class="${getStepStyle(step)}">${step}</span>` +
-                       (idx < currentSteps.length-1 ? `<span class="step-arrow">➜</span>` : '');
+                       (idx < currentSteps.length-1 ? `<span class="step-arrow text-lg">➜</span>` : '');
             }).join('');
             driveDisplay.textContent = computeDriveCost(currentSteps);
         }
@@ -397,31 +491,40 @@
         function renderNotes() {
             const charNotes = allNotes.filter(n => n.char === currentCharacter);
             if (charNotes.length === 0) {
-                cardList.innerHTML = `<div class="text-center text-zinc-600 mt-10 text-sm">尚無筆記</div>`;
+                cardList.innerHTML = `
+                    <div class="text-center text-gray-500 mt-10">
+                        <p class="text-xl font-bold">尚無筆記</p>
+                        <p class="text-sm mt-2">點擊右上方「+ 紀錄」新增第一筆</p>
+                    </div>
+                `;
                 return;
             }
             cardList.innerHTML = [...charNotes].reverse().map(note => {
+                const pLabel = primaryTagLabel(note.primaryTag);
                 const extras = note.extraTags || [];
-                let tagHtml = note.primaryTag ? `<span class="card-tag-primary">${note.primaryTag}</span>` : '';
-                tagHtml += extras.map(t => `<span class="card-tag-extra">${t}</span>`).join('');
+                
+                let tagHtml = '';
+                if (pLabel) tagHtml += `<span class="card-tag-primary">${pLabel}</span>`;
+                tagHtml += extras.map(t => `<span class="card-tag-extra">${extraTagLabel(t)}</span>`).join('');
 
                 let flowHtml = note.steps.map((step, idx) => {
-                    return `<span class="${getStepStyle(step)} !text-[10px] !py-0.5">${step}</span>` +
-                           (idx < note.steps.length-1 ? `<span class="step-arrow !text-[10px]">➜</span>` : '');
+                    const style = getStepStyle(step).replace('display-block', 'inline-block');
+                    return `<span class="${style} text-sm px-2 py-1 mr-1.5">${step}</span>` +
+                           (idx < note.steps.length-1 ? `<span class="step-arrow text-sm">➜</span>` : '');
                 }).join('');
 
                 return `
-                    <div class="card-preview" onclick="openFocus(${note.id})">
+                    <div class="card-preview group relative" onclick="openFocus(${note.id})" style="padding-right: 110px;">
                         <div class="delete-btn" onclick="deleteCard(event, ${note.id})">×</div>
                         <div class="card-stats">
-                            <div class="text-[9px] text-zinc-500 uppercase">Damage</div>
-                            <div class="text-xl font-bold text-white mono-font">${note.dmg}</div>
-                            <div class="text-[9px] text-zinc-500 uppercase mt-1">Drive</div>
-                            <div class="text-sm text-emerald-400 font-mono">${note.drive}</div>
+                            <div class="text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">DAMAGE</div>
+                            <div class="text-2xl font-bold text-white mono-font mb-1.5">${formatNumber(note.dmg)}</div>
+                            <div class="text-[10px] text-gray-400 uppercase tracking-wider">DRIVE</div>
+                            <div class="text-lg text-emerald-400 font-mono">${note.drive}</div>
                         </div>
-                        <div class="pr-24 space-y-3">
-                            <div class="flex flex-wrap gap-1">${tagHtml}</div>
-                            <div class="flex flex-wrap items-center bg-black/30 p-2 rounded-lg border border-white/5">${flowHtml}</div>
+                        <div class="pt-2 space-y-2">
+                            <div class="flex flex-wrap gap-1.5">${tagHtml}</div>
+                            <div class="text-xs text-zinc-300 mono-font bg-zinc-800/60 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-zinc-600/40 shadow-lg overflow-hidden">${flowHtml}</div>
                         </div>
                     </div>
                 `;
@@ -448,6 +551,7 @@
         window.openBuilder = () => {
             document.getElementById('builderSection').classList.remove('hidden');
             document.getElementById('addBtn').classList.add('hidden');
+            stepInput.focus();
         };
 
         window.closeBuilder = () => {
@@ -459,8 +563,10 @@
             document.getElementById('contentScreen').classList.add('hidden');
             document.getElementById('navBar').classList.add('hidden');
             document.getElementById('charSelectScreen').classList.remove('hidden');
+            closeBuilder();
         };
 
+        stepInput.addEventListener('input', function() { this.value = this.value.toUpperCase(); });
         stepInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && stepInput.value.trim()) {
                 currentSteps.push(stepInput.value.trim().toUpperCase());
@@ -482,22 +588,40 @@
         primaryButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 const tag = btn.getAttribute('data-tag-primary');
-                primaryTag = (primaryTag === tag) ? null : tag;
-                primaryButtons.forEach(b => b.style.borderColor = (b.getAttribute('data-tag-primary') === primaryTag) ? '#a855f7' : '#3f3f46');
+                if (primaryTag === tag) {
+                    primaryTag = null;
+                } else {
+                    primaryTag = tag;
+                }
+                primaryButtons.forEach(b => {
+                    if (b.getAttribute('data-tag-primary') === primaryTag) {
+                        b.classList.add('border-purple-400','bg-purple-900/50','text-purple-100','ring-2','ring-purple-400/50');
+                    } else {
+                        b.classList.remove('border-purple-400','bg-purple-900/50','text-purple-100','ring-2','ring-purple-400/50');
+                    }
+                });
             });
         });
 
         extraButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 const tag = btn.getAttribute('data-tag-extra');
-                if (extraTags.includes(tag)) extraTags = extraTags.filter(t => t !== tag);
-                else extraTags.push(tag);
-                btn.style.background = extraTags.includes(tag) ? 'rgba(168,85,247,0.2)' : 'transparent';
+                if (extraTags.includes(tag)) {
+                    extraTags = extraTags.filter(t => t !== tag);
+                } else {
+                    extraTags.push(tag);
+                }
+                if (extraTags.includes(tag)) {
+                    btn.classList.add('ring-2','ring-offset-1','ring-offset-zinc-900','bg-opacity-60');
+                } else {
+                    btn.classList.remove('ring-2','ring-offset-1','ring-offset-zinc-900','bg-opacity-60');
+                }
             });
         });
 
         saveBtn.addEventListener('click', async () => {
-            const dmgValue = document.getElementById('dmgInput').value;
+            const dmgInputEl = document.getElementById('dmgInput');
+            const dmgValue = dmgInputEl.value.trim();
             if (!currentSteps.length || !dmgValue) return alert("連段與傷害為必填");
 
             const note = {
@@ -506,7 +630,7 @@
                 steps: [...currentSteps],
                 okiRaw: currentOkiOptions.join('\n'),
                 frame: document.getElementById('frameInput').value || "0",
-                dmg: dmgValue,
+                dmg: dmgValue, // 儲存原始數值 (Number or String is fine, usually string from input)
                 drive: computeDriveCost(currentSteps),
                 primaryTag: primaryTag,
                 extraTags: [...extraTags]
@@ -520,7 +644,9 @@
             // 重設狀態
             currentSteps = []; currentOkiOptions = []; primaryTag = null; extraTags = [];
             renderPreview(); renderOkiPreview();
-            document.getElementById('dmgInput').value = ""; document.getElementById('frameInput').value = "";
+            dmgInputEl.value = ""; document.getElementById('frameInput').value = "";
+            primaryButtons.forEach(b => b.classList.remove('border-purple-400','bg-purple-900/50','text-purple-100','ring-2','ring-purple-400/50'));
+            extraButtons.forEach(b => b.classList.remove('ring-2','ring-offset-1','ring-offset-zinc-900','bg-opacity-60'));
         });
 
         window.deleteCard = (e, id) => {
@@ -539,25 +665,73 @@
 
         cancelDeleteBtn.addEventListener('click', () => deleteModal.classList.add('hidden'));
 
+        // 還原舊版 Focus 樹狀圖結構與樣式
         window.openFocus = (id) => {
             const note = allNotes.find(n => n.id === id);
             if (!note) return;
+
             const overlay = document.getElementById('focusOverlay');
-            document.getElementById('focusMainContent').innerHTML = `
-                <h2 class="text-4xl font-bold mb-4">${note.dmg} <span class="text-sm text-zinc-500">DMG</span></h2>
-                <div class="flex flex-wrap gap-4 text-2xl">${note.steps.map(s => `<span class="${getStepStyle(s)}">${s}</span>`).join(' ➜ ')}</div>
-                <div class="mt-6 text-green-400">Advantage: ${note.frame}F</div>
+            const main = document.getElementById('focusMainContent');
+            const tree = document.getElementById('focusTreeContent');
+            
+            let driveHtml = '';
+            const driveVal = Number(note.drive) || 0;
+            for(let i=0; i<6; i++) driveHtml += `<span class="drive-box ${i < driveVal ? 'drive-on' : 'drive-off'}"></span>`;
+            
+            let flowHtml = note.steps.map((step, idx) => {
+                const style = getStepStyle(step).replace('display-block', 'inline-block');
+                return `<span class="${style} text-3xl px-5 py-3 mx-3">${step}</span>` +
+                       (idx < note.steps.length-1 ? `<span class="step-arrow text-4xl">➜</span>` : '');
+            }).join('');
+
+            main.innerHTML = `
+                <div class="flex justify-between items-end border-b border-gray-700 pb-4 mb-6">
+                    <div>
+                        <div class="text-sm text-gray-400 mb-1">DRIVE COST</div>
+                        <div>${driveHtml}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm text-gray-400">DAMAGE</div>
+                        <div class="text-5xl font-bold text-white mono-font">${formatNumber(note.dmg)}</div>
+                    </div>
+                </div>
+                <div class="text-white mono-font leading-relaxed mb-6 text-xl">${flowHtml}</div>
+                <div class="flex items-center gap-3">
+                    <span class="bg-blue-900/40 text-blue-200 border border-blue-900/50 px-5 py-3 rounded-xl font-bold mono-font text-2xl backdrop-blur-sm">${note.frame}F</span>
+                    <span class="text-gray-400 text-xs tracking-[0.2em] uppercase">ADVANTAGE</span>
+                </div>
             `;
-            document.getElementById('focusTreeContent').innerHTML = note.okiRaw ? note.okiRaw.split('\n').map(o => `<div class="tactic-btn mb-2">➜ ${o}</div>`).join('') : '';
+
+            const okiLines = note.okiRaw ? note.okiRaw.split('\n').filter(l => l.trim() !== "") : [];
+            if (okiLines.length > 0) {
+                tree.innerHTML = okiLines.map(line => `
+                    <div class="tactic-btn">
+                        <span class="tactic-arrow">➜</span>
+                        <span>${line}</span>
+                    </div>
+                `).join('');
+            } else {
+                tree.innerHTML = `<div class="text-gray-500 text-center text-xl">無後續設定</div>`;
+            }
+
             overlay.style.display = 'flex';
-            setTimeout(() => overlay.style.opacity = '1', 10);
+            setTimeout(() => { overlay.classList.add('show'); }, 10);
         };
 
         window.closeFocus = () => {
             const overlay = document.getElementById('focusOverlay');
-            overlay.style.opacity = '0';
-            setTimeout(() => overlay.style.display = 'none', 120);
+            overlay.classList.remove('show');
+            setTimeout(() => { overlay.style.display = 'none'; }, 140);
         };
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const overlay = document.getElementById('focusOverlay');
+                if (overlay && overlay.style.display === 'flex') {
+                    closeFocus();
+                }
+            }
+        });
 
         renderCharGrid(characters);
     </script>
