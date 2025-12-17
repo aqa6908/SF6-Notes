@@ -25,40 +25,60 @@
         
         .step-arrow { color: #d946ef; font-weight: bold; margin: 0 6px; user-select: none; }
         
-        /* 輸入框 - 深色粗框 */
+        /* 輸入框樣式 - 美化版 */
+        .input-block, .input-field {
+            border-radius: 8px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.1rem;
+            padding: 10px 14px;
+            border: 2px solid #4b5563;
+            transition: all 0.2s ease;
+            background: linear-gradient(145deg, #0f0f23, #15152b);
+        }
         .input-field {
-            background-color: #0f0f23 !important;
-            border: 2px solid #4b5563 !important;
-            border-radius: 6px !important;
-            color: #f3f4f6 !important;
-            font-family: 'Roboto Mono', monospace !important;
-            padding: 6px 12px !important;
+            color: #f3f4f6;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
         }
         .input-field:focus {
-            border-color: #a855f7 !important;
-            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2) !important;
-            outline: none !important;
+            border-color: #a855f7;
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15), inset 0 1px 2px rgba(168, 85, 247, 0.1);
+            outline: none;
+            transform: translateY(-1px);
+        }
+        .input-field::placeholder {
+            color: #6b7280;
+            opacity: 0.8;
         }
 
-        /* 顯示框 - 無邊框、內嵌陰影 */
+        /* 美化顯示框 - 無外框、漸層背景 */
         .display-block {
-            background-color: #1a1a2e;
-            border-radius: 8px;
-            padding: 6px 12px;
+            background: linear-gradient(135deg, rgba(55, 65, 81, 0.6) 0%, rgba(31, 41, 55, 0.8) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(75, 85, 99, 0.4);
+            border-radius: 10px;
+            padding: 10px 14px;
             font-family: 'Roboto Mono', monospace;
-            font-size: 0.95rem;
-            margin-right: 4px;
-            margin-bottom: 4px;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+            font-size: 1rem;
+            margin: 2px 4px 2px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            min-height: 32px;
+        }
+        .display-block:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+            border-color: rgba(168, 85, 247, 0.3);
         }
 
-        /* 美化資訊卡 */
+        /* 美化後的資訊卡 */
         .card-preview {
             background: linear-gradient(135deg, #1e1e2e 0%, #2d2d3d 100%);
             border: 1px solid #404046;
             border-left: 4px solid #a855f7;
             border-radius: 12px;
-            padding: 24px;
+            padding: 20px;
             margin-bottom: 16px;
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
@@ -81,17 +101,18 @@
             border-left-color: #d946ef;
             box-shadow: 0 12px 40px rgba(168, 85, 247, 0.2);
         }
+        /* 修正：X按鈕位置，避免與DAMAGE重疊 */
         .card-preview .delete-btn {
             position: absolute;
-            top: 12px;
+            top: 16px;
             right: 16px;
             background: rgba(239, 68, 68, 0.2);
             border: 1px solid #6b7280;
             color: #9ca3af;
-            font-size: 1.1rem;
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
+            font-size: 1.3rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -106,9 +127,9 @@
             background: #ef4444;
             color: white;
             border-color: #dc2626;
+            transform: scale(1.1);
         }
 
-        /* 其他樣式保持原樣 */
         #focusOverlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -121,30 +142,72 @@
             opacity: 0;
             transition: opacity 0.12s ease-out;
         }
+
         .focus-container {
-            width: 95%; max-width: 1200px; min-height: 60vh;
-            display: flex; gap: 40px; align-items: center; flex-direction: column; 
+            width: 95%;
+            max-width: 1200px;
+            min-height: 60vh;
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            flex-direction: column; 
         }
-        @media (min-width: 768px) { .focus-container { flex-direction: row; } }
+        @media (min-width: 768px) {
+            .focus-container { flex-direction: row; }
+        }
+
         .focus-main {
-            flex: 1.2; background: radial-gradient(circle at top left, #3b0764 0, #18181b 45%, #020617 100%);
-            border: 1px solid #3f3f46; border-left: 6px solid #a855f7; padding: 40px; border-radius: 14px;
-            box-shadow: 0 0 60px rgba(0,0,0,0.9); width: 100%; display: flex; flex-direction: column;
-            justify-content: center; transform: translateY(6px); opacity: 0;
-            will-change: transform, opacity; transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.14s ease-out;
+            flex: 1.2;
+            background: radial-gradient(circle at top left, #3b0764 0, #18181b 45%, #020617 100%);
+            border: 1px solid #3f3f46;
+            border-left: 6px solid #a855f7;
+            padding: 40px;
+            border-radius: 14px;
+            box-shadow: 0 0 60px rgba(0,0,0,0.9);
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transform: translateY(6px);
+            opacity: 0;
+            will-change: transform, opacity;
+            transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.14s ease-out;
         }
+
         .focus-tree {
-            flex: 0.8; display: flex; flex-direction: column; justify-content: center; gap: 16px;
-            width: 100%; transform: translateY(6px); opacity: 0;
-            will-change: transform, opacity; transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1) 0.02s, opacity 0.16s ease-out 0.02s;
+            flex: 0.8;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 16px;
+            width: 100%;
+            transform: translateY(6px);
+            opacity: 0;
+            will-change: transform, opacity;
+            transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1) 0.02s, opacity 0.16s ease-out 0.02s;
         }
+
         #focusOverlay.show { opacity: 1; }
         #focusOverlay.show .focus-main { transform: translateY(0); opacity: 1; }
         #focusOverlay.show .focus-tree { transform: translateY(0); opacity: 1; }
 
-        .tactic-btn { background-color: #27272a; padding: 16px; border-radius: 8px; border: 1px solid #444; color: #e4e4e7;
-            display: flex; align-items: center; font-size: 1.05rem; box-shadow: 0 3px 5px rgba(0,0,0,0.3); }
-        .tactic-btn:hover { border-color: #444; background-color: #27272a; transform: none; color: #e4e4e7; }
+        .tactic-btn {
+            background-color: #27272a;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            color: #e4e4e7;
+            display: flex;
+            align-items: center;
+            font-size: 1.05rem;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.3);
+        }
+        .tactic-btn:hover {
+            border-color: #444;
+            background-color: #27272a;
+            transform: none;
+            color: #e4e4e7;
+        }
         .tactic-arrow { color: #22c55e; margin-right: 16px; font-weight: bold; font-size: 1.3rem; }
 
         .drive-box { width: 12px; height: 12px; margin-right: 3px; transform: skewX(-15deg); display: inline-block; }
@@ -160,24 +223,50 @@
         .char-name-display { font-family:'Teko',sans-serif;font-size:1.6rem;line-height:1;letter-spacing:1px;}
 
         .builder-shell {
-            background-image: linear-gradient(to right, rgba(63,63,70,0.25) 1px, transparent 1px),
+            background-image:
+                linear-gradient(to right, rgba(63,63,70,0.25) 1px, transparent 1px),
                 linear-gradient(to bottom, rgba(63,63,70,0.25) 1px, transparent 1px);
-            background-size: 24px 24px; background-color: #020617;
+            background-size: 24px 24px;
+            background-color: #020617;
         }
 
+        /* 修正：卡片內部標籤置中對齊 */
+        .card-tag-primary, .card-tag-extra {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin: 2px;
+        }
         .card-tag-primary {
-            background: linear-gradient(135deg, #9333ea, #a855f7); color: white; padding: 6px 12px;
-            border-radius: 20px; font-weight: 600; font-size: 0.875rem; box-shadow: 0 2px 8px rgba(147, 51, 234, 0.3);
-            display: inline-flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #9333ea, #a855f7);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            box-shadow: 0 2px 8px rgba(147, 51, 234, 0.3);
+            min-width: 68px;
         }
         .card-tag-extra {
-            background: rgba(107, 114, 128, 0.3); color: #d1d5db; padding: 4px 10px; border-radius: 12px;
-            font-size: 0.75rem; border: 1px solid #6b7280; display: inline-flex; align-items: center;
-            justify-content: center; min-width: 48px;
+            background: rgba(107, 114, 128, 0.3);
+            color: #d1d5db;
+            padding: 6px 12px;
+            border-radius: 14px;
+            font-size: 0.8rem;
+            border: 1px solid #6b7280;
+            min-width: 56px;
         }
         .card-stats {
-            background: rgba(17, 24, 39, 0.6); backdrop-filter: blur(10px); border: 1px solid #374151;
-            border-radius: 10px; padding: 16px 20px; text-align: center; min-width: 100px; margin-left: auto;
+            background: rgba(17, 24, 39, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid #374151;
+            border-radius: 10px;
+            padding: 16px 20px;
+            text-align: center;
+            min-width: 100px;
+            /* 增加右側間距避免與X重疊 */
+            margin-left: auto;
         }
     </style>
 </head>
@@ -205,7 +294,7 @@
         </button>
     </div>
 
-    <!-- Character Select - 完整保留 -->
+    <!-- Character Select -->
     <div id="charSelectScreen" class="container mx-auto mt-6 px-2 max-w-2xl animate-[fadeIn_0.5s_ease-out]">
         <div class="text-center mb-6 sticky top-0 bg-[#050509] z-40 py-4 border-b border-zinc-800">
             <h1 class="text-5xl text-white fight-font mb-2">CHARACTER SELECT</h1>
@@ -227,5 +316,604 @@
             </div>
 
             <div class="p-5 space-y-4 bg-zinc-950/80">
-              <!-- Combo Builder 區塊 -->
-              <div class="bg-zinc-900/70
+              <!-- Combo Builder 區塊 - 美化版 -->
+              <div class="bg-zinc-900/70 border border-zinc-500 rounded-xl p-5">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-sm text-purple-200 font-semibold tracking-wide">連段步驟</span>
+                  <span class="text-xs text-zinc-400">Enter 新增 · Backspace 刪除</span>
+                </div>
+                <div id="comboPreview" class="bg-gradient-to-r from-zinc-800/80 to-zinc-900/80 backdrop-blur-sm p-4 rounded-xl min-h-[70px] flex flex-wrap items-center gap-2 border border-zinc-600/50 shadow-2xl">
+                    <span class="text-zinc-400 text-sm">輸入指令按 Enter... 如: 2MP, DR, 236PP</span>
+                </div>
+                <div class="flex gap-3 mt-4">
+                    <input type="text" id="stepInput" class="input-field flex-1" placeholder="輸入連段指令...">
+                </div>
+              </div>
+
+              <!-- 壓起身選項區塊 - 美化版 -->
+              <div class="bg-zinc-900/70 border border-zinc-500 rounded-xl p-5">
+                <div class="flex justify-between mb-3 items-center">
+                    <div>
+                      <label class="text-sm text-blue-200 font-semibold tracking-wide">壓起身選項</label>
+                      <div class="text-xs text-zinc-400 mt-1">Enter 新增 · Backspace 刪除</div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <label class="text-xs text-gray-300">有利幀</label>
+                        <input type="text" id="frameInput" class="input-field text-green-300 w-20 text-center text-sm" placeholder="+42">
+                    </div>
+                </div>
+
+                <div id="okiPreview" class="bg-gradient-to-r from-zinc-800/80 to-zinc-900/80 backdrop-blur-sm border border-zinc-600/50 rounded-xl p-4 min-h-[60px] mb-3 flex flex-wrap items-start gap-2 shadow-2xl">
+                    <span class="text-zinc-400 text-sm">輸入選項按 Enter，例如：投、Shimmy、走回頭大腳...</span>
+                </div>
+
+                <input type="text" id="okiStepInput" class="input-field w-full text-sm"
+                       placeholder="如：投、Shimmy、走回頭 2MP">
+              </div>
+
+              <!-- 傷害 + 標籤 + 鬥氣 -->
+              <div class="bg-zinc-900/70 border border-zinc-500 rounded-xl p-5 space-y-4">
+                <!-- 傷害 -->
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-rose-200 font-semibold tracking-wide">傷害</span>
+                    <span id="dmgError" class="text-xs text-red-400 hidden">請輸入傷害數值</span>
+                  </div>
+                  <input
+                    type="number"
+                    id="dmgInput"
+                    min="1"
+                    class="input-field w-full max-w-xs text-rose-100"
+                    placeholder="例如 248">
+                </div>
+
+                <!-- 標籤 -->
+                <div>
+                  <div class="flex justify-between items-center mb-3">
+                    <span class="text-sm text-purple-200 font-semibold tracking-wide">標籤</span>
+                    <span class="text-xs text-zinc-400">輕/中/重 擇一 · 其他可多選</span>
+                  </div>
+
+                  <div class="flex flex-wrap gap-2 mb-3">
+                    <button data-tag-primary="light"  class="tag-primary px-4 py-2 text-sm rounded-full border border-zinc-600 text-zinc-100 bg-zinc-900/50 hover:border-purple-400 hover:bg-purple-900/30 transition-all">輕起始</button>
+                    <button data-tag-primary="medium" class="tag-primary px-4 py-2 text-sm rounded-full border border-zinc-600 text-zinc-100 bg-zinc-900/50 hover:border-purple-400 hover:bg-purple-900/30 transition-all">中起始</button>
+                    <button data-tag-primary="heavy"  class="tag-primary px-4 py-2 text-sm rounded-full border border-zinc-600 text-zinc-100 bg-zinc-900/50 hover:border-purple-400 hover:bg-purple-900/30 transition-all">重起始</button>
+                  </div>
+
+                  <div class="flex flex-wrap gap-2">
+                    <button data-tag-extra="corner" class="tag-extra px-3 py-2 text-xs rounded-full border border-zinc-700 text-amber-200 bg-amber-900/30 hover:border-amber-400 hover:bg-amber-900/50 transition-all">版邊限定</button>
+                    <button data-tag-extra="punish" class="tag-extra px-3 py-2 text-xs rounded-full border border-zinc-700 text-red-200 bg-red-900/30 hover:border-red-400 hover:bg-red-900/50 transition-all">確反</button>
+                    <button data-tag-extra="kill"   class="tag-extra px-3 py-2 text-xs rounded-full border border-zinc-700 text-emerald-200 bg-emerald-900/30 hover:border-emerald-400 hover:bg-emerald-900/50 transition-all">斬殺</button>
+                  </div>
+                </div>
+
+                <!-- 鬥氣 -->
+                <div class="flex items-center justify-between pt-2">
+                  <span class="text-sm text-emerald-200 font-semibold tracking-wide">鬥氣消耗</span>
+                  <div class="flex items-center gap-3">
+                    <span id="driveDisplay" class="input-field text-emerald-300 w-12 text-sm py-2 border border-emerald-500/50 rounded-lg text-center font-bold bg-gradient-to-r from-emerald-900/30 to-emerald-900/50">
+                      0
+                    </span>
+                    <span class="text-xs text-zinc-400">自動計算，最大 6</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex gap-3 pt-2">
+                  <button id="saveBtn" class="flex-1 bg-gradient-to-r from-purple-700 to-purple-600 hover:from-purple-600 hover:to-purple-500 text-white py-3 rounded-xl text-sm shadow-xl font-bold transition-all transform hover:scale-[1.02] hover:shadow-2xl">
+                      儲存筆記
+                  </button>
+                  <button onclick="closeBuilder()" class="px-6 text-gray-300 hover:text-white text-sm py-3 rounded-xl border border-zinc-600 hover:border-zinc-400 transition-all">
+                      取消
+                  </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Library -->
+        <div id="librarySection">
+            <div id="cardList" class="space-y-4 pb-20"></div>
+        </div>
+    </div>
+
+    <!-- 自訂刪除確認視窗 -->
+    <div id="deleteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+      <div class="bg-zinc-900 border border-zinc-700 rounded-xl w-80 p-6 shadow-2xl">
+        <h3 class="text-xl font-bold text-red-400 mb-3">刪除連段？</h3>
+        <p class="text-sm text-gray-300 mb-5">這個連段會從清單中永久移除，無法復原。</p>
+        <div class="flex justify-end gap-3">
+          <button id="cancelDeleteBtn" class="px-4 py-2 text-sm rounded-lg border border-zinc-600 text-gray-300 hover:bg-zinc-700 transition-all">
+            取消
+          </button>
+          <button id="confirmDeleteBtn" class="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-500 shadow-lg transition-all">
+            確定刪除
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyAog6i-mDornqBzLI-81aeXhS_2eP6kx-A",
+          authDomain: "sf6-notes.firebaseapp.com",
+          projectId: "sf6-notes",
+          storageBucket: "sf6-notes.firebasestorage.app",
+          messagingSenderId: "832506018972",
+          appId: "1:832506018972:web:428aaef84a1aa802d40159",
+          measurementId: "G-39RZ6VTXZ7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let currentCharacter = ""; 
+        let allNotes = [];
+        let currentSteps = [];
+        let currentOkiOptions = [];
+        let primaryTag = null;
+        let extraTags = [];
+
+        let characters = [
+            "A.K.I.", "BLANKA", "C.VIPER", "CAMMY", "CHUN-LI", 
+            "DEE JAY", "DHALSIM", "E.HONDA", "ED", "ELENA", 
+            "GOUKI", "GUILE", "JAMIE", "JP", "JURI", 
+            "KEN", "KIMBERLY", "LILY", "LUKE", "MAI", 
+            "MANON", "MARISA", "RASHID", "RYU", "TERRY", 
+            "VEGA", "ZANGIEF"
+        ];
+        characters.sort();
+
+        const previewDiv   = document.getElementById('comboPreview');
+        const stepInput    = document.getElementById('stepInput');
+        const saveBtn      = document.getElementById('saveBtn');
+        const cardList     = document.getElementById('cardList');
+        const okiPreview   = document.getElementById('okiPreview');
+        const okiStepInput = document.getElementById('okiStepInput');
+        const driveDisplay = document.getElementById('driveDisplay');
+
+        const deleteModal      = document.getElementById('deleteModal');
+        const cancelDeleteBtn  = document.getElementById('cancelDeleteBtn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        let pendingDeleteId = null;
+
+        const primaryButtons = document.querySelectorAll('[data-tag-primary]');
+        const extraButtons   = document.querySelectorAll('[data-tag-extra]');
+
+        function getStepStyle(step) {
+            const upper = step.toUpperCase();
+            if (upper === 'DRC') {
+                return 'display-block bg-gradient-to-r from-green-900/70 to-green-800/70 text-green-200 border border-green-500/60 shadow-green-500/30';
+            }
+            if (upper === 'DR') {
+                return 'display-block bg-gradient-to-r from-green-900/60 to-green-800/60 text-green-200 border border-green-500/50 shadow-green-500/25';
+            }
+            if (upper.includes('SA1') || upper.includes('SA2') || upper.includes('SA3')) {
+                return 'display-block bg-gradient-to-r from-sky-900/70 to-sky-800/70 text-sky-200 border border-sky-500/60 shadow-sky-500/30';
+            }
+            if (upper.includes('PP') || upper.includes('KK')) {
+                return 'display-block bg-gradient-to-r from-amber-900/70 to-amber-800/70 text-amber-200 border border-amber-500/60 shadow-amber-500/30';
+            }
+            return 'display-block bg-gradient-to-r from-zinc-700/70 to-zinc-600/70 text-white border border-zinc-500/60 shadow-zinc-500/30';
+        }
+
+        function computeDriveCost(steps) {
+            let total = 0;
+            for (const raw of steps) {
+                const s = raw.toUpperCase();
+                if (s === 'DR') total += 1;
+                if (s === 'DRC') total += 3;
+                if (s.includes('PP') || s.includes('KK')) total += 2;
+            }
+            total = Math.max(0, Math.min(6, total));
+            return total;
+        }
+
+        function renderCharGrid(list) {
+            const grid = document.getElementById('charGrid');
+            grid.innerHTML = list.map(name => `
+                <div class="char-btn" onclick="selectCharacter('${name}')">
+                    <span class="char-name-display">${name}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderPreview() {
+            if (currentSteps.length === 0) {
+                previewDiv.innerHTML = '<span class="text-zinc-400 text-sm">輸入指令按 Enter... 如: 2MP, DR, 236PP</span>';
+                if (driveDisplay) driveDisplay.textContent = '0';
+                return;
+            }
+            previewDiv.innerHTML = currentSteps.map((step, idx) => {
+                const style = getStepStyle(step);
+                return `<span class="${style}">${step}</span>` +
+                       (idx < currentSteps.length-1 ? `<span class="step-arrow text-lg">➜</span>` : '');
+            }).join('');
+
+            const cost = computeDriveCost(currentSteps);
+            if (driveDisplay) driveDisplay.textContent = String(cost);
+        }
+
+        function renderOkiPreview() {
+            if (currentOkiOptions.length === 0) {
+                okiPreview.innerHTML = '<span class="text-zinc-400 text-sm">輸入選項按 Enter，例如：投、Shimmy、走回頭大腳...</span>';
+                return;
+            }
+            okiPreview.innerHTML = currentOkiOptions.map(opt => `
+                <span class="display-block bg-gradient-to-r from-zinc-700/70 to-zinc-600/70 border-zinc-500/60 text-gray-100">${opt}</span>
+            `).join('');
+        }
+
+        function primaryTagLabel(tag) {
+            if (tag === 'light') return '輕起始';
+            if (tag === 'medium') return '中起始';
+            if (tag === 'heavy') return '重起始';
+            return null;
+        }
+
+        function extraTagLabel(tag) {
+            if (tag === 'corner') return '版邊限定';
+            if (tag === 'punish') return '確反';
+            if (tag === 'kill') return '斬殺';
+            return tag;
+        }
+
+        function renderNotes() {
+            const charNotes = allNotes.filter(n => n.char === currentCharacter);
+
+            if (charNotes.length === 0) {
+                cardList.innerHTML = `
+                    <div class="text-center text-gray-500 mt-10">
+                        <p class="text-xl font-bold">尚無筆記</p>
+                        <p class="text-sm mt-2">點擊右上方「+ 紀錄」新增第一筆</p>
+                    </div>
+                `;
+                return;
+            }
+
+            cardList.innerHTML = [...charNotes].reverse().map(note => {
+                const pLabel = primaryTagLabel(note.primaryTag);
+                const extras = Array.isArray(note.extraTags) ? note.extraTags : [];
+                const driveVal = Number(note.drive) || 0;
+
+                let tagHtml = '';
+                if (pLabel) {
+                    tagHtml += `<span class="card-tag-primary">${pLabel}</span>`;
+                }
+                if (extras.length > 0) {
+                    tagHtml += extras.map(t => {
+                        const label = extraTagLabel(t);
+                        return `<span class="card-tag-extra">${label}</span>`;
+                    }).join('');
+                }
+
+                let flowHtml = note.steps.map((step, idx) => {
+                    const style = getStepStyle(step).replace('display-block', 'inline-block');
+                    return `<span class="${style} text-sm px-3 py-1.5 mr-2">${step}</span>` +
+                           (idx < note.steps.length-1 ? `<span class="step-arrow text-base">➜</span>` : '');
+                }).join('');
+
+                return `
+                    <div class="card-preview group" onclick="openFocus(${note.id})">
+                        <div class="delete-btn" onclick="deleteCard(event, ${note.id})">×</div>
+                        <div class="flex flex-col lg:flex-row justify-between items-start gap-4 pt-6">
+                            <div class="flex-1 min-w-0 space-y-3">
+                                <div class="flex flex-wrap gap-2 justify-start items-center mb-4">${tagHtml}</div>
+                                <div class="text-sm text-zinc-300 mono-font bg-zinc-800/60 backdrop-blur-sm px-5 py-4 rounded-2xl border border-zinc-600/40 shadow-xl">${flowHtml}</div>
+                            </div>
+                            <div class="card-stats flex flex-col justify-center">
+                                <div class="text-xs text-gray-400 uppercase tracking-wider mb-1">DAMAGE</div>
+                                <div class="text-3xl font-bold text-white mono-font mb-3">${note.dmg}</div>
+                                <div class="text-xs text-gray-400 uppercase tracking-wider">DRIVE</div>
+                                <div class="text-xl text-emerald-400 font-mono font-bold">${driveVal}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function loadNotesFromCloud() {
+            allNotes = [];
+            const q = query(collection(db, "notes"), where("char", "==", currentCharacter));
+            const snap = await getDocs(q);
+            snap.forEach(docSnap => {
+                const data = docSnap.data();
+                allNotes.push({
+                    id: data.id,
+                    docId: docSnap.id,
+                    ...data
+                });
+            });
+            renderNotes();
+        }
+
+        async function saveCardToCloud(noteObj) {
+            const docRef = await addDoc(collection(db, "notes"), noteObj);
+            return docRef.id;
+        }
+
+        // global for onclick
+        window.selectCharacter = async function(name) {
+            currentCharacter = name;
+            document.getElementById('charSelectScreen').classList.add('hidden');
+            document.getElementById('contentScreen').classList.remove('hidden');
+            document.getElementById('navBar').classList.remove('hidden');
+            document.getElementById('navTitle').innerText = name;
+            await loadNotesFromCloud();
+        };
+
+        window.goBackToSelect = function() {
+            document.getElementById('contentScreen').classList.add('hidden');
+            document.getElementById('navBar').classList.add('hidden');
+            document.getElementById('charSelectScreen').classList.remove('hidden');
+            closeBuilder();
+        };
+
+        window.openFocus = function(id) {
+            const note = allNotes.find(n => n.id === id);
+            if (!note) return;
+
+            const overlay = document.getElementById('focusOverlay');
+            const main = document.getElementById('focusMainContent');
+            const tree = document.getElementById('focusTreeContent');
+            
+            let driveHtml = '';
+            const driveVal = Number(note.drive) || 0;
+            for(let i=0; i<6; i++) driveHtml += `<span class="drive-box ${i < driveVal ? 'drive-on' : 'drive-off'}"></span>`;
+            
+            let flowHtml = note.steps.map((step, idx) => {
+                const style = getStepStyle(step).replace('display-block', 'inline-block');
+                return `<span class="${style} text-3xl px-5 py-3 mx-3">${step}</span>` +
+                       (idx < note.steps.length-1 ? `<span class="step-arrow text-4xl">➜</span>` : '');
+            }).join('');
+
+            main.innerHTML = `
+                <div class="flex justify-between items-end border-b border-gray-700 pb-4 mb-6">
+                    <div>
+                        <div class="text-sm text-gray-400 mb-1">DRIVE COST</div>
+                        <div>${driveHtml}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm text-gray-400">DAMAGE</div>
+                        <div class="text-5xl font-bold text-white mono-font">${note.dmg}</div>
+                    </div>
+                </div>
+                <div class="text-white mono-font leading-relaxed mb-6 text-xl">${flowHtml}</div>
+                <div class="flex items-center gap-3">
+                    <span class="bg-blue-900/40 text-blue-200 border border-blue-900/50 px-5 py-3 rounded-xl font-bold mono-font text-2xl backdrop-blur-sm">${note.frame}F</span>
+                    <span class="text-gray-400 text-xs tracking-[0.2em] uppercase">ADVANTAGE</span>
+                </div>
+            `;
+
+            const okiLines = note.okiRaw.split('\n').filter(l => l.trim() !== "");
+            if (okiLines.length > 0) {
+                tree.innerHTML = okiLines.map(line => `
+                    <div class="tactic-btn">
+                        <span class="tactic-arrow">➜</span>
+                        <span>${line}</span>
+                    </div>
+                `).join('');
+            } else {
+                tree.innerHTML = `<div class="text-gray-500 text-center text-xl">無後續設定</div>`;
+            }
+
+            overlay.style.display = 'flex';
+            setTimeout(() => { overlay.classList.add('show'); }, 10);
+        };
+
+        window.closeFocus = function() {
+            const overlay = document.getElementById('focusOverlay');
+            overlay.classList.remove('show');
+            setTimeout(() => { overlay.style.display = 'none'; }, 140);
+        };
+
+        // ESC 關閉 overlay
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const overlay = document.getElementById('focusOverlay');
+                if (overlay && overlay.style.display === 'flex') {
+                    closeFocus();
+                }
+            }
+        });
+
+        window.deleteCard = function(event, id) {
+            event.stopPropagation();
+            pendingDeleteId = id;
+            deleteModal.classList.remove('hidden');
+        };
+
+        cancelDeleteBtn.addEventListener('click', () => {
+            pendingDeleteId = null;
+            deleteModal.classList.add('hidden');
+        });
+
+        confirmDeleteBtn.addEventListener('click', async () => {
+            if (pendingDeleteId == null) {
+                deleteModal.classList.add('hidden');
+                return;
+            }
+            const id = pendingDeleteId;
+            pendingDeleteId = null;
+            deleteModal.classList.add('hidden');
+
+            const note = allNotes.find(n => n.id === id);
+            if (!note) return;
+
+            allNotes = allNotes.filter(n => n.id !== id);
+            renderNotes();
+
+            if (note.docId) {
+                try {
+                    await deleteDoc(doc(db, "notes", note.docId));
+                } catch (e) {
+                    console.error("刪除雲端失敗", e);
+                }
+            }
+        });
+
+        function openBuilder() {
+            const builder = document.getElementById('builderSection');
+            const btn = document.getElementById('addBtn');
+            builder.classList.remove('hidden');
+            btn.classList.add('hidden');
+            stepInput.focus();
+        }
+
+        function closeBuilder() {
+            const builder = document.getElementById('builderSection');
+            const btn = document.getElementById('addBtn');
+            builder.classList.add('hidden');
+            btn.classList.remove('hidden');
+        }
+
+        window.openBuilder = openBuilder;
+        window.closeBuilder = closeBuilder;
+
+        // 初始 render
+        renderCharGrid(characters);
+        renderPreview();
+        renderOkiPreview();
+
+        // 輸入互動
+        stepInput.addEventListener('input', function() { this.value = this.value.toUpperCase(); });
+
+        stepInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && this.value.trim() !== "") {
+                currentSteps.push(this.value.trim().toUpperCase());
+                this.value = ""; 
+                renderPreview();
+            } else if (e.key === 'Backspace' && this.value === "" && currentSteps.length > 0) {
+                currentSteps.pop();
+                renderPreview();
+                e.preventDefault();
+            }
+        });
+
+        okiStepInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && this.value.trim() !== "") {
+                currentOkiOptions.push(this.value.trim());
+                this.value = "";
+                renderOkiPreview();
+            } else if (e.key === 'Backspace' && this.value === "" && currentOkiOptions.length > 0) {
+                currentOkiOptions.pop();
+                renderOkiPreview();
+                e.preventDefault();
+            }
+        });
+
+        primaryButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tag = btn.getAttribute('data-tag-primary');
+                if (primaryTag === tag) {
+                    primaryTag = null;
+                } else {
+                    primaryTag = tag;
+                }
+                primaryButtons.forEach(b => {
+                    const t = b.getAttribute('data-tag-primary');
+                    if (t === primaryTag) {
+                        b.classList.add('border-purple-400','bg-purple-900/50','text-purple-100','ring-2','ring-purple-400/50');
+                    } else {
+                        b.classList.remove('border-purple-400','bg-purple-900/50','text-purple-100','ring-2','ring-purple-400/50');
+                    }
+                });
+            });
+        });
+
+        extraButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tag = btn.getAttribute('data-tag-extra');
+                if (extraTags.includes(tag)) {
+                    extraTags = extraTags.filter(t => t !== tag);
+                } else {
+                    extraTags.push(tag);
+                }
+                if (extraTags.includes(tag)) {
+                    btn.classList.add('ring-2','ring-offset-1','ring-offset-zinc-900','bg-opacity-60');
+                } else {
+                    btn.classList.remove('ring-2','ring-offset-1','ring-offset-zinc-900','bg-opacity-60');
+                }
+            });
+        });
+
+        // 儲存按鈕（含傷害必填）
+        saveBtn.addEventListener('click', async function() {
+            if (currentSteps.length === 0) {
+                alert("請輸入連段！");
+                return;
+            }
+
+            const dmgInputEl = document.getElementById('dmgInput');
+            const dmgErrorEl = document.getElementById('dmgError');
+            const dmgValue = dmgInputEl ? dmgInputEl.value.trim() : "";
+
+            // 檢查傷害必填
+            if (!dmgValue) {
+                if (dmgErrorEl) dmgErrorEl.classList.remove('hidden');
+                if (dmgInputEl) {
+                    dmgInputEl.classList.remove('border-zinc-600');
+                    dmgInputEl.classList.add('border-red-500','ring-2','ring-red-400/50');
+                    dmgInputEl.focus();
+                }
+                return;
+            } else {
+                if (dmgErrorEl) dmgErrorEl.classList.add('hidden');
+                if (dmgInputEl) {
+                    dmgInputEl.classList.remove('border-red-500','ring-2','ring-red-400/50');
+                    dmgInputEl.classList.add('border-zinc-600');
+                }
+            }
+
+            const frameInputEl = document.getElementById('frameInput');
+            const frameVal = frameInputEl ? frameInputEl.value : "";
+            const driveVal = computeDriveCost(currentSteps);
+
+            const note = {
+                id: Date.now(),
+                char: currentCharacter,
+                steps: [...currentSteps],
+                okiRaw: currentOkiOptions.join('\n'),
+                frame: frameVal,
+                dmg: dmgValue,
+                type: primaryTag || "combo",
+                drive: driveVal,
+                primaryTag: primaryTag,
+                extraTags: [...extraTags]
+            };
+
+            allNotes.push(note);
+            renderNotes();
+
+            // 清空狀態
+            currentSteps = [];
+            currentOkiOptions = [];
+            primaryTag = null;
+            extraTags = [];
+            stepInput.value = "";
+            okiStepInput.value = "";
+            if (dmgInputEl) dmgInputEl.value = "";
+            if (frameInputEl) frameInputEl.value = "";
+            if (driveDisplay) driveDisplay.textContent = '0';
+            renderPreview();
+            renderOkiPreview();
+            primaryButtons.forEach(b => b.classList.remove('border-purple-400','bg-purple-900/50','text-purple-100','ring-2','ring-purple-400/50'));
+            extraButtons.forEach(b => b.classList.remove('ring-2','ring-offset-1','ring-offset-zinc-900','bg-opacity-60'));
+
+            // 儲存後關閉 Combos
+            closeBuilder();
+
+            try {
+                const docId = await saveCardToCloud(note);
+                note.docId = docId;
+            } catch (e) {
+                console.error("儲存到雲端失敗", e);
+            }
+        });
+    </script>
+</body>
+</html>
