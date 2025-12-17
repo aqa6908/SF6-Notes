@@ -26,15 +26,12 @@
         .step-arrow { color: #d946ef; font-weight: bold; margin: 0 6px; user-select: none; }
         
         .input-block {
-            background-color: #2d2d2d;
-            border: 1px solid #444;
-            padding: 4px 10px;
             border-radius: 4px;
             display: inline-flex;
             align-items: center;
             font-family: 'Roboto Mono', monospace;
             font-size: 1.1rem;
-            color: #fff;
+            padding: 4px 10px;
         }
 
         .card-preview {
@@ -127,7 +124,6 @@
             font-size: 1.05rem;
             box-shadow: 0 3px 5px rgba(0,0,0,0.3);
         }
-        /* 4. 無 hover 強調 */
         .tactic-btn:hover {
             border-color: #444;
             background-color: #27272a;
@@ -136,7 +132,6 @@
         }
         .tactic-arrow { color: #22c55e; margin-right: 16px; font-weight: bold; font-size: 1.3rem; }
 
-        /* 刪除鍵避免重疊 */
         .delete-btn {
             position: absolute;
             top: 6px;
@@ -162,11 +157,10 @@
         .char-btn:hover { background-color:#3f3f46;color:#fff;border-color:#d946ef;transform:scale(1.05);}
         .char-name-display { font-family:'Teko',sans-serif;font-size:1.6rem;line-height:1;letter-spacing:1px;}
 
-        /* Builder 背景加一點格線感 */
         .builder-shell {
             background-image:
-                linear-gradient(to right, rgba(63,63,70,0.3) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(63,63,70,0.3) 1px, transparent 1px);
+                linear-gradient(to right, rgba(63,63,70,0.25) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(63,63,70,0.25) 1px, transparent 1px);
             background-size: 24px 24px;
             background-color: #020617;
         }
@@ -202,7 +196,6 @@
     </div>
 
     <div id="contentScreen" class="hidden container mx-auto mt-20 px-4 max-w-md">
-        <!-- Builder 區塊視覺化 -->
         <div id="builderSection" class="hidden mb-6 relative">
           <div class="builder-shell rounded-xl border border-zinc-700 shadow-2xl overflow-hidden">
             <div class="border-b border-zinc-700 px-5 py-3 flex items-center justify-between bg-zinc-950/70">
@@ -213,72 +206,72 @@
               <span class="text-[10px] uppercase tracking-[0.2em] text-zinc-500">BUILDER</span>
             </div>
 
-            <div class="p-5 space-y-4 bg-zinc-950/70">
+            <div class="p-5 space-y-4 bg-zinc-950/80">
               <!-- Combo Builder 區塊 -->
-              <div class="bg-zinc-900/90 border border-zinc-700 rounded-lg p-4">
+              <div class="bg-zinc-900/70 border border-zinc-500 rounded-lg p-4">
                 <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs text-zinc-400 font-semibold">連段步驟</span>
-                  <span class="text-[10px] text-zinc-500">ENTER 新增 · Backspace 刪除</span>
+                  <span class="text-xs text-zinc-300 font-semibold">連段步驟</span>
+                  <span class="text-[10px] text-zinc-400">ENTER 新增 · Backspace 刪除</span>
                 </div>
-                <div id="comboPreview" class="bg-black/80 p-3 rounded min-h-[52px] flex flex-wrap items-center border border-zinc-700 text-sm shadow-inner">
-                    <span class="text-zinc-500 text-xs">輸入指令按 Enter...</span>
+                <div id="comboPreview" class="bg-zinc-800 p-3 rounded min-h-[52px] flex flex-wrap items-center border border-zinc-500 text-sm shadow-inner">
+                    <span class="text-zinc-300 text-xs">輸入指令按 Enter...</span>
                 </div>
                 <div class="flex gap-2 mt-3">
-                    <input type="text" id="stepInput" class="flex-1 bg-zinc-800 border border-zinc-700 text-white p-2.5 rounded text-sm outline-none focus:border-purple-500 transition uppercase font-mono placeholder-gray-500" placeholder="如: 2MP">
+                    <input type="text" id="stepInput" class="flex-1 bg-zinc-900 border border-zinc-600 text-white p-2.5 rounded text-sm outline-none focus:border-purple-500 transition uppercase font-mono placeholder-gray-400" placeholder="如: 2MP, DR, 236PP">
                 </div>
               </div>
 
               <!-- 壓起身選項區塊 -->
-              <div class="bg-zinc-900/90 border border-zinc-700 rounded-lg p-4">
+              <div class="bg-zinc-900/70 border border-zinc-500 rounded-lg p-4">
                 <div class="flex justify-between mb-2 items-center">
                     <div>
-                      <label class="text-sm text-blue-400 font-bold">壓起身選項</label>
-                      <div class="text-[10px] text-zinc-500 mt-0.5">ENTER 新增 · Backspace 刪除</div>
+                      <label class="text-sm text-blue-300 font-bold">壓起身選項</label>
+                      <div class="text-[10px] text-zinc-400 mt-0.5">ENTER 新增 · Backspace 刪除</div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <label class="text-[10px] text-gray-400">有利幀</label>
-                        <input type="text" id="frameInput" class="bg-zinc-800 text-green-400 w-16 text-center text-sm border border-zinc-600 rounded font-mono" placeholder="+42">
+                        <label class="text-[10px] text-gray-300">有利幀</label>
+                        <input type="text" id="frameInput" class="bg-zinc-900 text-green-300 w-16 text-center text-sm border border-zinc-500 rounded font-mono" placeholder="+42">
                     </div>
                 </div>
 
-                <div id="okiPreview" class="bg-zinc-950 border border-zinc-700 rounded p-3 min-h-[40px] mb-2 flex flex-wrap items-center">
-                    <span class="text-zinc-500 text-xs">輸入選項按 Enter，例如：投、Shimmy、走回頭大腳...</span>
+                <div id="okiPreview" class="bg-zinc-800 border border-zinc-500 rounded p-3 min-h-[40px] mb-2 flex flex-wrap items-center">
+                    <span class="text-zinc-300 text-xs">輸入選項按 Enter，例如：投、Shimmy、走回頭大腳...</span>
                 </div>
 
                 <input type="text" id="okiStepInput"
-                       class="w-full bg-zinc-800 text-gray-100 text-sm p-2 border border-zinc-600 rounded outline-none focus:border-blue-500"
+                       class="w-full bg-zinc-900 text-gray-100 text-sm p-2 border border-zinc-600 rounded outline-none focus:border-blue-500"
                        placeholder="如：投、Shimmy、走回頭 2MP">
               </div>
 
-              <!-- 2. 標籤 + 鬥氣（多選 Tag + 數字 Drive） -->
-              <div class="bg-zinc-900/90 border border-zinc-700 rounded-lg p-4 space-y-3">
+              <!-- 標籤 + 鬥氣（多選 Tag + 自動 Drive） -->
+              <div class="bg-zinc-900/70 border border-zinc-500 rounded-lg p-4 space-y-3">
                 <div class="flex justify-between items-center">
-                  <span class="text-xs text-zinc-400 font-semibold">標籤</span>
-                  <span class="text-[10px] text-zinc-500">輕/中/重 擇一 · 其他可多選</span>
+                  <span class="text-xs text-zinc-300 font-semibold">標籤</span>
+                  <span class="text-[10px] text-zinc-400">輕/中/重 擇一 · 其他可多選</span>
                 </div>
 
                 <!-- Combo 起始：三選一 -->
                 <div class="flex flex-wrap gap-2 mb-2">
-                  <button data-tag-primary="light"  class="tag-primary px-2.5 py-1 text-xs rounded-full border border-zinc-600 text-zinc-200 bg-zinc-800 hover:border-purple-400">輕起始</button>
-                  <button data-tag-primary="medium" class="tag-primary px-2.5 py-1 text-xs rounded-full border border-zinc-600 text-zinc-200 bg-zinc-800 hover:border-purple-400">中起始</button>
-                  <button data-tag-primary="heavy"  class="tag-primary px-2.5 py-1 text-xs rounded-full border border-zinc-600 text-zinc-200 bg-zinc-800 hover:border-purple-400">重起始</button>
+                  <button data-tag-primary="light"  class="tag-primary px-2.5 py-1 text-xs rounded-full border border-zinc-600 text-zinc-200 bg-zinc-900 hover:border-purple-400">輕起始</button>
+                  <button data-tag-primary="medium" class="tag-primary px-2.5 py-1 text-xs rounded-full border border-zinc-600 text-zinc-200 bg-zinc-900 hover:border-purple-400">中起始</button>
+                  <button data-tag-primary="heavy"  class="tag-primary px-2.5 py-1 text-xs rounded-full border border-zinc-600 text-zinc-200 bg-zinc-900 hover:border-purple-400">重起始</button>
                 </div>
 
                 <!-- 其他多選標籤 -->
                 <div class="flex flex-wrap gap-2">
-                  <button data-tag-extra="corner" class="tag-extra px-2.5 py-1 text-xs rounded-full border border-zinc-700 text-amber-200 bg-amber-900/30 hover:border-amber-400">版邊限定</button>
-                  <button data-tag-extra="punish" class="tag-extra px-2.5 py-1 text-xs rounded-full border border-zinc-700 text-red-200 bg-red-900/30 hover:border-red-400">確反</button>
-                  <button data-tag-extra="kill"   class="tag-extra px-2.5 py-1 text-xs rounded-full border border-zinc-700 text-emerald-200 bg-emerald-900/30 hover:border-emerald-400">斬殺</button>
+                  <button data-tag-extra="corner" class="tag-extra px-2.5 py-1 text-xs rounded-full border border-zinc-700 text-amber-200 bg-amber-900/40 hover:border-amber-400">版邊限定</button>
+                  <button data-tag-extra="punish" class="tag-extra px-2.5 py-1 text-xs rounded-full border border-zinc-700 text-red-200 bg-red-900/40 hover:border-red-400">確反</button>
+                  <button data-tag-extra="kill"   class="tag-extra px-2.5 py-1 text-xs rounded-full border border-zinc-700 text-emerald-200 bg-emerald-900/40 hover:border-emerald-400">斬殺</button>
                 </div>
 
-                <!-- 鬥氣數量 -->
+                <!-- 鬥氣數量顯示 -->
                 <div class="mt-3 flex items-center justify-between">
-                  <span class="text-xs text-zinc-400 font-semibold">鬥氣消耗</span>
+                  <span class="text-xs text-zinc-300 font-semibold">鬥氣消耗</span>
                   <div class="flex items-center gap-2">
-                    <input type="number" id="driveInput" min="0" max="6"
-                      class="bg-zinc-800 text-white w-16 text-xs p-1.5 border border-zinc-600 rounded outline-none text-center"
-                      placeholder="0~6">
-                    <span class="text-[10px] text-zinc-500">未填視為 0</span>
+                    <span id="driveDisplay" class="bg-zinc-900 text-emerald-300 w-10 text-xs py-1 border border-emerald-500/70 rounded text-center mono-font">
+                      0
+                    </span>
+                    <span class="text-[10px] text-zinc-400">自動計算，最大 6</span>
                   </div>
                 </div>
               </div>
@@ -287,7 +280,7 @@
                   <button id="saveBtn" class="flex-1 bg-purple-700 hover:bg-purple-600 text-white py-2.5 rounded text-sm shadow-lg font-bold">
                       儲存筆記
                   </button>
-                  <button onclick="toggleBuilder()" class="px-4 text-gray-400 hover:text-white text-sm">
+                  <button onclick="toggleBuilder()" class="px-4 text-gray-300 hover:text-white text-sm">
                       取消
                   </button>
               </div>
@@ -296,8 +289,7 @@
         </div>
 
         <div id="librarySection">
-            <div id="cardList" class="space-y-4 pb-20">
-            </div>
+            <div id="cardList" class="space-y-4 pb-20"></div>
         </div>
     </div>
 
@@ -357,7 +349,7 @@
         const cardList     = document.getElementById('cardList');
         const okiPreview   = document.getElementById('okiPreview');
         const okiStepInput = document.getElementById('okiStepInput');
-        const driveInput   = document.getElementById('driveInput');
+        const driveDisplay = document.getElementById('driveDisplay');
 
         const deleteModal      = document.getElementById('deleteModal');
         const cancelDeleteBtn  = document.getElementById('cancelDeleteBtn');
@@ -366,6 +358,35 @@
 
         const primaryButtons = document.querySelectorAll('[data-tag-primary]');
         const extraButtons   = document.querySelectorAll('[data-tag-extra]');
+
+        function getStepStyle(step) {
+            const upper = step.toUpperCase();
+            if (upper === 'DRC') {
+                return 'bg-green-900/40 text-green-300 border border-green-500/70';
+            }
+            if (upper === 'DR') {
+                return 'bg-green-900/40 text-green-300 border border-green-500/70';
+            }
+            if (upper.includes('SA1') || upper.includes('SA2') || upper.includes('SA3')) {
+                return 'bg-sky-900/40 text-sky-200 border border-sky-500/70';
+            }
+            if (upper.includes('PP') || upper.includes('KK')) {
+                return 'bg-amber-900/40 text-amber-200 border border-amber-500/70';
+            }
+            return 'bg-zinc-700 text-white border border-zinc-500';
+        }
+
+        function computeDriveCost(steps) {
+            let total = 0;
+            for (const raw of steps) {
+                const s = raw.toUpperCase();
+                if (s === 'DR') total += 1;
+                if (s === 'DRC') total += 3;
+                if (s.includes('PP') || s.includes('KK')) total += 2;
+            }
+            total = Math.max(0, Math.min(6, total)); // clamp 0~6 [web:331][web:334]
+            return total;
+        }
 
         function renderCharGrid(list) {
             const grid = document.getElementById('charGrid');
@@ -378,24 +399,27 @@
 
         function renderPreview() {
             if (currentSteps.length === 0) {
-                previewDiv.innerHTML = '<span class="text-zinc-500 text-xs">輸入指令按 Enter...</span>';
+                previewDiv.innerHTML = '<span class="text-zinc-300 text-xs">輸入指令按 Enter...</span>';
+                if (driveDisplay) driveDisplay.textContent = '0';
                 return;
             }
             previewDiv.innerHTML = currentSteps.map((step, idx) => {
-                let style = "bg-zinc-700";
-                if (['DR', 'PC', 'DI', 'OD'].includes(step)) style = "bg-green-900 text-green-300 border border-green-700";
-                else if (step.includes('SA')) style = "bg-red-900 text-red-200 border border-red-700";
-                return `<span class="input-block ${style} text-sm">${step}</span>` + (idx < currentSteps.length-1 ? `<span class="step-arrow text-base">➜</span>` : '');
+                const style = getStepStyle(step);
+                return `<span class="input-block ${style} text-sm mr-1 mb-1">${step}</span>` +
+                       (idx < currentSteps.length-1 ? `<span class="step-arrow text-base">➜</span>` : '');
             }).join('');
+
+            const cost = computeDriveCost(currentSteps);
+            if (driveDisplay) driveDisplay.textContent = String(cost);
         }
 
         function renderOkiPreview() {
             if (currentOkiOptions.length === 0) {
-                okiPreview.innerHTML = '<span class="text-zinc-500 text-xs">輸入選項按 Enter，例如：投、Shimmy、走回頭大腳...</span>';
+                okiPreview.innerHTML = '<span class="text-zinc-300 text-xs">輸入選項按 Enter，例如：投、Shimmy、走回頭大腳...</span>';
                 return;
             }
             okiPreview.innerHTML = currentOkiOptions.map(opt => `
-                <span class="bg-zinc-800 border border-zinc-600 text-xs text-gray-100 rounded px-2 py-1 mr-1 mb-1 inline-flex items-center">
+                <span class="bg-zinc-900 border border-zinc-600 text-xs text-gray-100 rounded px-2 py-1 mr-1 mb-1 inline-flex items-center">
                   ${opt}
                 </span>
             `).join('');
@@ -420,10 +444,9 @@
                 if(note.type === 'setup') { typeLabel = "詐欺跳"; typeColor = "text-yellow-200 border-yellow-700 bg-yellow-900/50"; }
 
                 let flowHtml = note.steps.map((step, idx) => {
-                    let style = "bg-zinc-700 px-1 rounded";
-                    if (['DR', 'PC', 'DI', 'OD'].includes(step)) style = "text-green-400 font-bold";
-                    else if (step.includes('SA')) style = "text-red-400 font-bold";
-                    return `<span class="${style}">${step}</span>` + (idx < note.steps.length-1 ? `<span class="step-arrow">➜</span>` : '');
+                    const style = getStepStyle(step);
+                    return `<span class="px-1 rounded ${style} text-xs">${step}</span>` +
+                           (idx < note.steps.length-1 ? `<span class="step-arrow text-xs">➜</span>` : '');
                 }).join('');
 
                 return `
@@ -492,10 +515,9 @@
             for(let i=0; i<6; i++) driveHtml += `<span class="drive-box ${i < driveVal ? 'drive-on' : 'drive-off'}"></span>`;
             
             let flowHtml = note.steps.map((step, idx) => {
-                let style = "bg-zinc-700 px-3 py-1 rounded mx-1 text-3xl"; 
-                if (['DR', 'PC', 'DI', 'OD'].includes(step)) style = "text-green-400 font-bold text-3xl mx-1";
-                else if (step.includes('SA')) style = "text-red-400 font-bold text-3xl mx-1";
-                return `<span class="${style} inline-block mb-3">${step}</span>` + (idx < note.steps.length-1 ? `<span class="step-arrow text-3xl">➜</span>` : '');
+                const style = getStepStyle(step);
+                return `<span class="${style} inline-block mb-3 px-3 py-1 rounded mx-1 text-3xl mono-font">${step}</span>` +
+                       (idx < note.steps.length-1 ? `<span class="step-arrow text-3xl">➜</span>` : '');
             }).join('');
 
             main.innerHTML = `
@@ -657,9 +679,7 @@
                 alert("請輸入連段！");
                 return;
             }
-            let driveVal = Number(driveInput.value);
-            if (isNaN(driveVal)) driveVal = 0;
-            driveVal = Math.max(0, Math.min(6, driveVal));
+            const driveVal = computeDriveCost(currentSteps);
 
             const note = {
                 id: Date.now(),
@@ -667,8 +687,8 @@
                 steps: [...currentSteps],
                 okiRaw: currentOkiOptions.join('\n'),
                 frame: document.getElementById('frameInput').value || "?",
-                dmg: document.getElementById('dmgInput').value || "0",
-                type: primaryTag || "combo",           // 保留原本 type 欄位，暫時用 primaryTag 對應
+                dmg: document.getElementById('dmgInput')?.value || "0",
+                type: primaryTag || "combo",
                 drive: driveVal,
                 primaryTag: primaryTag,
                 extraTags: [...extraTags]
@@ -685,7 +705,7 @@
             okiStepInput.value = "";
             document.getElementById('dmgInput').value = "";
             document.getElementById('frameInput').value = "";
-            driveInput.value = "";
+            if (driveDisplay) driveDisplay.textContent = '0';
             renderPreview();
             renderOkiPreview();
             primaryButtons.forEach(b => b.classList.remove('border-purple-400','bg-purple-900/40','text-purple-100'));
