@@ -251,9 +251,9 @@
 
                 <!-- Combo 起始：三選一 -->
                 <div class="flex flex-wrap gap-2 mb-2">
-                  <button data-tag-primary="light"  class="tag-primary px-2.5 py-1 text-xs rounded-full border border-zinc-600 text-zinc-200 bg-zinc-900 hover:border-purple-400">輕起始</button>
-                  <button data-tag-primary="medium" class="tag-primary px-2.5 py-1 text-xs rounded-full border border-zinc-600 text-zinc-200 bg-zinc-900 hover:border-purple-400">中起始</button>
-                  <button data-tag-primary="heavy"  class="tag-primary px-2.5 py-1 text-xs rounded-full border border-zinc-600 text-zinc-200 bg-zinc-900 hover:border-purple-400">重起始</button>
+                  <button data-tag-primary="light"  class="tag-primary px-3 py-1 text-sm rounded-full border border-zinc-600 text-zinc-100 bg-zinc-900 hover:border-purple-400">輕起始</button>
+                  <button data-tag-primary="medium" class="tag-primary px-3 py-1 text-sm rounded-full border border-zinc-600 text-zinc-100 bg-zinc-900 hover:border-purple-400">中起始</button>
+                  <button data-tag-primary="heavy"  class="tag-primary px-3 py-1 text-sm rounded-full border border-zinc-600 text-zinc-100 bg-zinc-900 hover:border-purple-400">重起始</button>
                 </div>
 
                 <!-- 其他多選標籤 -->
@@ -383,7 +383,7 @@
                 if (s === 'DRC') total += 3;
                 if (s.includes('PP') || s.includes('KK')) total += 2;
             }
-            total = Math.max(0, Math.min(6, total)); // clamp 0~6 [web:331][web:334]
+            total = Math.max(0, Math.min(6, total)); // clamp 0~6 [web:373]
             return total;
         }
 
@@ -452,21 +452,17 @@
             }
 
             cardList.innerHTML = [...charNotes].reverse().map(note => {
-                let typeLabel = "連段", typeColor = "text-blue-200 border-blue-700 bg-blue-900/50";
-                if(note.type === 'punish') { typeLabel = "確反"; typeColor = "text-red-200 border-red-700 bg-red-900/50"; }
-                if(note.type === 'setup') { typeLabel = "詐欺跳"; typeColor = "text-yellow-200 border-yellow-700 bg-yellow-900/50"; }
-
                 const pLabel = primaryTagLabel(note.primaryTag);
                 const extras = Array.isArray(note.extraTags) ? note.extraTags : [];
 
                 let tagHtml = '';
                 if (pLabel) {
-                    tagHtml += `<span class="px-2 py-0.5 rounded-full bg-purple-900/60 text-purple-100 border border-purple-500/80 text-[10px] font-bold mr-1">${pLabel}</span>`;
+                    tagHtml += `<span class="px-3 py-0.5 rounded-full bg-purple-900/60 text-purple-100 border border-purple-500/80 text-sm font-bold mr-2 inline-block">${pLabel}</span>`;
                 }
                 if (extras.length > 0) {
                     tagHtml += extras.map(t => {
                         const label = extraTagLabel(t);
-                        return `<span class="px-1.5 py-0.5 rounded-full bg-zinc-800 text-zinc-200 border border-zinc-600 text-[10px] mr-1">${label}</span>`;
+                        return `<span class="px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-200 border border-zinc-600 text-[11px] mr-1 inline-block">${label}</span>`;
                     }).join('');
                 }
 
@@ -476,17 +472,22 @@
                            (idx < note.steps.length-1 ? `<span class="step-arrow text-xs">➜</span>` : '');
                 }).join('');
 
+                const driveVal = Number(note.drive) || 0;
+
                 return `
                     <div class="card-preview group" onclick="openFocus(${note.id})">
                         <div class="delete-btn" onclick="deleteCard(event, ${note.id})">×</div>
-                        <div class="flex justify-between items-start mb-1 pt-4">
-                            <div class="flex-1">
+                        <div class="flex justify-between items-start mb-2 pt-4">
+                            <div class="flex-1 pr-2">
                                 <div class="mb-1">${tagHtml}</div>
-                                <span class="${typeColor} text-[11px] px-2 py-0.5 rounded border font-bold uppercase tracking-wide inline-block mt-0.5">${typeLabel}</span>
                             </div>
-                            <div class="text-right pr-1">
+                            <div class="text-right">
                                 <div class="text-[10px] text-gray-500 uppercase">Damage</div>
                                 <div class="text-xl font-bold text-white leading-none mono-font mt-0.5">${note.dmg}</div>
+                                <div class="mt-1">
+                                  <span class="text-[10px] text-gray-500 uppercase mr-1">Drive</span>
+                                  <span class="text-sm text-emerald-300 mono-font">${driveVal}</span>
+                                </div>
                             </div>
                         </div>
                         <div class="text-sm mono-font text-gray-300 truncate">${flowHtml}</div>
@@ -563,7 +564,7 @@
                 </div>
                 <div class="text-white mono-font leading-relaxed mb-6 text-xl">${flowHtml}</div>
                 <div class="flex items-center gap-3">
-                    <span class="bg-blue-900/30 text-blue-200 border border-blue-900 px-4 py-2 rounded font-bold mono-font text-2xl">+${note.frame}F</span>
+                    <span class="bg-blue-900/30 text-blue-200 border border-blue-900 px-4 py-2 rounded font-bold mono-font text-2xl">${note.frame}F</span>
                     <span class="text-gray-400 text-xs tracking-[0.2em] uppercase">ADVANTAGE</span>
                 </div>
             `;
@@ -725,7 +726,7 @@
                 char: currentCharacter,
                 steps: [...currentSteps],
                 okiRaw: currentOkiOptions.join('\n'),
-                frame: document.getElementById('frameInput').value || "?",
+                frame: document.getElementById('frameInput').value || "",
                 dmg: document.getElementById('dmgInput')?.value || "0",
                 type: primaryTag || "combo",
                 drive: driveVal,
@@ -750,8 +751,11 @@
             primaryButtons.forEach(b => b.classList.remove('border-purple-400','bg-purple-900/40','text-purple-100'));
             extraButtons.forEach(b => b.classList.remove('ring-1','ring-offset-1','ring-offset-zinc-900'));
 
-            // 2. 儲存後自動關閉建置格
-            toggleBuilder();
+            // 5. 確保儲存後 builder 關閉
+            const builder = document.getElementById('builderSection');
+            if (builder && !builder.classList.contains('hidden')) {
+                toggleBuilder();
+            }
 
             try {
                 const docId = await saveCardToCloud(note);
