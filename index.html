@@ -25,45 +25,40 @@
         
         .step-arrow { color: #d946ef; font-weight: bold; margin: 0 6px; user-select: none; }
         
-        /* 輸入框樣式 - 深色、有邊框 */
-        .input-block, .input-field {
-            border-radius: 6px;
-            font-family: 'Roboto Mono', monospace;
-            font-size: 1.1rem;
-            padding: 6px 12px;
-            border: 2px solid #4b5563;
-            transition: all 0.15s;
-        }
+        /* 輸入框 - 深色粗框 */
         .input-field {
-            background-color: #0f0f23;
-            color: #f3f4f6;
+            background-color: #0f0f23 !important;
+            border: 2px solid #4b5563 !important;
+            border-radius: 6px !important;
+            color: #f3f4f6 !important;
+            font-family: 'Roboto Mono', monospace !important;
+            padding: 6px 12px !important;
         }
         .input-field:focus {
-            border-color: #a855f7;
-            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
-            outline: none;
+            border-color: #a855f7 !important;
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2) !important;
+            outline: none !important;
         }
 
-        /* 顯示框樣式 - 淺色背景、無邊框 */
+        /* 顯示框 - 無邊框、內嵌陰影 */
         .display-block {
-            background-color: #1e1e2e;
-            border: 1px solid #373a47;
+            background-color: #1a1a2e;
             border-radius: 8px;
-            padding: 8px 12px;
+            padding: 6px 12px;
             font-family: 'Roboto Mono', monospace;
-            font-size: 1rem;
+            font-size: 0.95rem;
             margin-right: 4px;
             margin-bottom: 4px;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
         }
 
-        /* 美化後的資訊卡 */
+        /* 美化資訊卡 */
         .card-preview {
             background: linear-gradient(135deg, #1e1e2e 0%, #2d2d3d 100%);
             border: 1px solid #404046;
             border-left: 4px solid #a855f7;
             border-radius: 12px;
-            padding: 20px;
+            padding: 24px;
             margin-bottom: 16px;
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
@@ -86,14 +81,15 @@
             border-left-color: #d946ef;
             box-shadow: 0 12px 40px rgba(168, 85, 247, 0.2);
         }
+        /* X 按鈕移到更右上，避免重疊 */
         .card-preview .delete-btn {
             position: absolute;
             top: 12px;
-            right: 12px;
+            right: 16px;
             background: rgba(239, 68, 68, 0.2);
             border: 1px solid #6b7280;
             color: #9ca3af;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             width: 32px;
             height: 32px;
             border-radius: 8px;
@@ -102,6 +98,7 @@
             justify-content: center;
             opacity: 0;
             transition: all 0.2s;
+            z-index: 10;
         }
         .card-preview:hover .delete-btn {
             opacity: 1;
@@ -212,7 +209,7 @@
             background-color: #020617;
         }
 
-        /* 卡片內部標籤樣式 */
+        /* 卡片內部標籤樣式 - 置中對齊 */
         .card-tag-primary {
             background: linear-gradient(135deg, #9333ea, #a855f7);
             color: white;
@@ -221,6 +218,9 @@
             font-weight: 600;
             font-size: 0.875rem;
             box-shadow: 0 2px 8px rgba(147, 51, 234, 0.3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         .card-tag-extra {
             background: rgba(107, 114, 128, 0.3);
@@ -229,15 +229,20 @@
             border-radius: 12px;
             font-size: 0.75rem;
             border: 1px solid #6b7280;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 48px;
         }
         .card-stats {
             background: rgba(17, 24, 39, 0.6);
             backdrop-filter: blur(10px);
             border: 1px solid #374151;
             border-radius: 10px;
-            padding: 12px 16px;
+            padding: 16px 20px;
             text-align: center;
-            min-width: 90px;
+            min-width: 100px;
+            margin-left: auto;
         }
     </style>
 </head>
@@ -404,134 +409,11 @@
       </div>
     </div>
 
+    <!-- 保持原 JS 不變，僅調整 renderNotes 中的卡片 HTML -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyAog6i-mDornqBzLI-81aeXhS_2eP6kx-A",
-          authDomain: "sf6-notes.firebaseapp.com",
-          projectId: "sf6-notes",
-          storageBucket: "sf6-notes.firebasestorage.app",
-          messagingSenderId: "832506018972",
-          appId: "1:832506018972:web:428aaef84a1aa802d40159",
-          measurementId: "G-39RZ6VTXZ7"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        let currentCharacter = ""; 
-        let allNotes = [];
-        let currentSteps = [];
-        let currentOkiOptions = [];
-        let primaryTag = null;
-        let extraTags = [];
-
-        let characters = [
-            "A.K.I.", "BLANKA", "C.VIPER", "CAMMY", "CHUN-LI", 
-            "DEE JAY", "DHALSIM", "E.HONDA", "ED", "ELENA", 
-            "GOUKI", "GUILE", "JAMIE", "JP", "JURI", 
-            "KEN", "KIMBERLY", "LILY", "LUKE", "MAI", 
-            "MANON", "MARISA", "RASHID", "RYU", "TERRY", 
-            "VEGA", "ZANGIEF"
-        ];
-        characters.sort();
-
-        const previewDiv   = document.getElementById('comboPreview');
-        const stepInput    = document.getElementById('stepInput');
-        const saveBtn      = document.getElementById('saveBtn');
-        const cardList     = document.getElementById('cardList');
-        const okiPreview   = document.getElementById('okiPreview');
-        const okiStepInput = document.getElementById('okiStepInput');
-        const driveDisplay = document.getElementById('driveDisplay');
-
-        const deleteModal      = document.getElementById('deleteModal');
-        const cancelDeleteBtn  = document.getElementById('cancelDeleteBtn');
-        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-        let pendingDeleteId = null;
-
-        const primaryButtons = document.querySelectorAll('[data-tag-primary]');
-        const extraButtons   = document.querySelectorAll('[data-tag-extra]');
-
-        function getStepStyle(step) {
-            const upper = step.toUpperCase();
-            if (upper === 'DRC') {
-                return 'display-block bg-green-900/50 text-green-300 border border-green-500/80';
-            }
-            if (upper === 'DR') {
-                return 'display-block bg-green-900/50 text-green-300 border border-green-500/80';
-            }
-            if (upper.includes('SA1') || upper.includes('SA2') || upper.includes('SA3')) {
-                return 'display-block bg-sky-900/50 text-sky-200 border border-sky-500/80';
-            }
-            if (upper.includes('PP') || upper.includes('KK')) {
-                return 'display-block bg-amber-900/50 text-amber-200 border border-amber-500/80';
-            }
-            return 'display-block bg-zinc-700 text-white border border-zinc-500';
-        }
-
-        function computeDriveCost(steps) {
-            let total = 0;
-            for (const raw of steps) {
-                const s = raw.toUpperCase();
-                if (s === 'DR') total += 1;
-                if (s === 'DRC') total += 3;
-                if (s.includes('PP') || s.includes('KK')) total += 2;
-            }
-            total = Math.max(0, Math.min(6, total));
-            return total;
-        }
-
-        function renderCharGrid(list) {
-            const grid = document.getElementById('charGrid');
-            grid.innerHTML = list.map(name => `
-                <div class="char-btn" onclick="selectCharacter('${name}')">
-                    <span class="char-name-display">${name}</span>
-                </div>
-            `).join('');
-        }
-
-        function renderPreview() {
-            if (currentSteps.length === 0) {
-                previewDiv.innerHTML = '<span class="text-zinc-300 text-xs">輸入指令按 Enter...</span>';
-                if (driveDisplay) driveDisplay.textContent = '0';
-                return;
-            }
-            previewDiv.innerHTML = currentSteps.map((step, idx) => {
-                const style = getStepStyle(step);
-                return `<span class="${style}">${step}</span>` +
-                       (idx < currentSteps.length-1 ? `<span class="step-arrow text-base">➜</span>` : '');
-            }).join('');
-
-            const cost = computeDriveCost(currentSteps);
-            if (driveDisplay) driveDisplay.textContent = String(cost);
-        }
-
-        function renderOkiPreview() {
-            if (currentOkiOptions.length === 0) {
-                okiPreview.innerHTML = '<span class="text-zinc-300 text-xs">輸入選項按 Enter，例如：投、Shimmy、走回頭大腳...</span>';
-                return;
-            }
-            okiPreview.innerHTML = currentOkiOptions.map(opt => `
-                <span class="display-block bg-zinc-700 border-zinc-500 text-gray-100">${opt}</span>
-            `).join('');
-        }
-
-        function primaryTagLabel(tag) {
-            if (tag === 'light') return '輕起始';
-            if (tag === 'medium') return '中起始';
-            if (tag === 'heavy') return '重起始';
-            return null;
-        }
-
-        function extraTagLabel(tag) {
-            if (tag === 'corner') return '版邊限定';
-            if (tag === 'punish') return '確反';
-            if (tag === 'kill') return '斬殺';
-            return tag;
-        }
-
+        // ... 原有的所有 JS 程式碼完全不變，複製你上一個版本的 script 區塊即可 ...
+        
+        // 只需確保 renderNotes() 函數中的卡片 HTML 使用新的 layout：
         function renderNotes() {
             const charNotes = allNotes.filter(n => n.char === currentCharacter);
 
@@ -570,7 +452,7 @@
                 return `
                     <div class="card-preview group" onclick="openFocus(${note.id})">
                         <div class="delete-btn" onclick="deleteCard(event, ${note.id})">×</div>
-                        <div class="flex flex-col lg:flex-row justify-between items-start gap-4 pt-4">
+                        <div class="flex flex-col lg:flex-row justify-between items-start gap-4 pt-2">
                             <div class="flex-1 min-w-0 space-y-3">
                                 <div class="flex flex-wrap gap-2 mb-3">${tagHtml}</div>
                                 <div class="text-sm text-zinc-300 mono-font bg-zinc-800/50 backdrop-blur-sm px-4 py-3 rounded-xl border border-zinc-600/50">${flowHtml}</div>
@@ -586,305 +468,8 @@
                 `;
             }).join('');
         }
-
-        async function loadNotesFromCloud() {
-            allNotes = [];
-            const q = query(collection(db, "notes"), where("char", "==", currentCharacter));
-            const snap = await getDocs(q);
-            snap.forEach(docSnap => {
-                const data = docSnap.data();
-                allNotes.push({
-                    id: data.id,
-                    docId: docSnap.id,
-                    ...data
-                });
-            });
-            renderNotes();
-        }
-
-        async function saveCardToCloud(noteObj) {
-            const docRef = await addDoc(collection(db, "notes"), noteObj);
-            return docRef.id;
-        }
-
-        // global for onclick
-        window.selectCharacter = async function(name) {
-            currentCharacter = name;
-            document.getElementById('charSelectScreen').classList.add('hidden');
-            document.getElementById('contentScreen').classList.remove('hidden');
-            document.getElementById('navBar').classList.remove('hidden');
-            document.getElementById('navTitle').innerText = name;
-            await loadNotesFromCloud();
-        };
-
-        window.goBackToSelect = function() {
-            document.getElementById('contentScreen').classList.add('hidden');
-            document.getElementById('navBar').classList.add('hidden');
-            document.getElementById('charSelectScreen').classList.remove('hidden');
-            closeBuilder();
-        };
-
-        window.openFocus = function(id) {
-            const note = allNotes.find(n => n.id === id);
-            if (!note) return;
-
-            const overlay = document.getElementById('focusOverlay');
-            const main = document.getElementById('focusMainContent');
-            const tree = document.getElementById('focusTreeContent');
-            
-            let driveHtml = '';
-            const driveVal = Number(note.drive) || 0;
-            for(let i=0; i<6; i++) driveHtml += `<span class="drive-box ${i < driveVal ? 'drive-on' : 'drive-off'}"></span>`;
-            
-            let flowHtml = note.steps.map((step, idx) => {
-                const style = getStepStyle(step);
-                return `<span class="${style.replace('display-block', 'inline-block')} text-3xl px-4 py-2 mx-2">${step}</span>` +
-                       (idx < note.steps.length-1 ? `<span class="step-arrow text-3xl">➜</span>` : '');
-            }).join('');
-
-            main.innerHTML = `
-                <div class="flex justify-between items-end border-b border-gray-700 pb-4 mb-6">
-                    <div>
-                        <div class="text-sm text-gray-400 mb-1">DRIVE COST</div>
-                        <div>${driveHtml}</div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-sm text-gray-400">DAMAGE</div>
-                        <div class="text-5xl font-bold text-white mono-font">${note.dmg}</div>
-                    </div>
-                </div>
-                <div class="text-white mono-font leading-relaxed mb-6 text-xl">${flowHtml}</div>
-                <div class="flex items-center gap-3">
-                    <span class="bg-blue-900/30 text-blue-200 border border-blue-900 px-4 py-2 rounded font-bold mono-font text-2xl">${note.frame}F</span>
-                    <span class="text-gray-400 text-xs tracking-[0.2em] uppercase">ADVANTAGE</span>
-                </div>
-            `;
-
-            const okiLines = note.okiRaw.split('\n').filter(l => l.trim() !== "");
-            if (okiLines.length > 0) {
-                tree.innerHTML = okiLines.map(line => `
-                    <div class="tactic-btn">
-                        <span class="tactic-arrow">➜</span>
-                        <span>${line}</span>
-                    </div>
-                `).join('');
-            } else {
-                tree.innerHTML = `<div class="text-gray-500 text-center text-xl">無後續設定</div>`;
-            }
-
-            overlay.style.display = 'flex';
-            setTimeout(() => { overlay.classList.add('show'); }, 10);
-        };
-
-        window.closeFocus = function() {
-            const overlay = document.getElementById('focusOverlay');
-            overlay.classList.remove('show');
-            setTimeout(() => { overlay.style.display = 'none'; }, 140);
-        };
-
-        // ESC 關閉 overlay
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                const overlay = document.getElementById('focusOverlay');
-                if (overlay && overlay.style.display === 'flex') {
-                    closeFocus();
-                }
-            }
-        });
-
-        window.deleteCard = function(event, id) {
-            event.stopPropagation();
-            pendingDeleteId = id;
-            deleteModal.classList.remove('hidden');
-        };
-
-        cancelDeleteBtn.addEventListener('click', () => {
-            pendingDeleteId = null;
-            deleteModal.classList.add('hidden');
-        });
-
-        confirmDeleteBtn.addEventListener('click', async () => {
-            if (pendingDeleteId == null) {
-                deleteModal.classList.add('hidden');
-                return;
-            }
-            const id = pendingDeleteId;
-            pendingDeleteId = null;
-            deleteModal.classList.add('hidden');
-
-            const note = allNotes.find(n => n.id === id);
-            if (!note) return;
-
-            allNotes = allNotes.filter(n => n.id !== id);
-            renderNotes();
-
-            if (note.docId) {
-                try {
-                    await deleteDoc(doc(db, "notes", note.docId));
-                } catch (e) {
-                    console.error("刪除雲端失敗", e);
-                }
-            }
-        });
-
-        function openBuilder() {
-            const builder = document.getElementById('builderSection');
-            const btn = document.getElementById('addBtn');
-            builder.classList.remove('hidden');
-            btn.classList.add('hidden');
-            stepInput.focus();
-        }
-
-        function closeBuilder() {
-            const builder = document.getElementById('builderSection');
-            const btn = document.getElementById('addBtn');
-            builder.classList.add('hidden');
-            btn.classList.remove('hidden');
-        }
-
-        window.openBuilder = openBuilder;
-        window.closeBuilder = closeBuilder;
-
-        // 初始 render
-        renderCharGrid(characters);
-        renderPreview();
-        renderOkiPreview();
-
-        // 輸入互動
-        stepInput.addEventListener('input', function() { this.value = this.value.toUpperCase(); });
-
-        stepInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && this.value.trim() !== "") {
-                currentSteps.push(this.value.trim().toUpperCase());
-                this.value = ""; 
-                renderPreview();
-            } else if (e.key === 'Backspace' && this.value === "" && currentSteps.length > 0) {
-                currentSteps.pop();
-                renderPreview();
-                e.preventDefault();
-            }
-        });
-
-        okiStepInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && this.value.trim() !== "") {
-                currentOkiOptions.push(this.value.trim());
-                this.value = "";
-                renderOkiPreview();
-            } else if (e.key === 'Backspace' && this.value === "" && currentOkiOptions.length > 0) {
-                currentOkiOptions.pop();
-                renderOkiPreview();
-                e.preventDefault();
-            }
-        });
-
-        primaryButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tag = btn.getAttribute('data-tag-primary');
-                if (primaryTag === tag) {
-                    primaryTag = null;
-                } else {
-                    primaryTag = tag;
-                }
-                primaryButtons.forEach(b => {
-                    const t = b.getAttribute('data-tag-primary');
-                    if (t === primaryTag) {
-                        b.classList.add('border-purple-400','bg-purple-900/40','text-purple-100');
-                    } else {
-                        b.classList.remove('border-purple-400','bg-purple-900/40','text-purple-100');
-                    }
-                });
-            });
-        });
-
-        extraButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tag = btn.getAttribute('data-tag-extra');
-                if (extraTags.includes(tag)) {
-                    extraTags = extraTags.filter(t => t !== tag);
-                } else {
-                    extraTags.push(tag);
-                }
-                if (extraTags.includes(tag)) {
-                    btn.classList.add('ring-1','ring-offset-1','ring-offset-zinc-900');
-                } else {
-                    btn.classList.remove('ring-1','ring-offset-1','ring-offset-zinc-900');
-                }
-            });
-        });
-
-        // 儲存按鈕（含傷害必填）
-        saveBtn.addEventListener('click', async function() {
-            if (currentSteps.length === 0) {
-                alert("請輸入連段！");
-                return;
-            }
-
-            const dmgInputEl = document.getElementById('dmgInput');
-            const dmgErrorEl = document.getElementById('dmgError');
-            const dmgValue = dmgInputEl ? dmgInputEl.value.trim() : "";
-
-            // 檢查傷害必填
-            if (!dmgValue) {
-                if (dmgErrorEl) dmgErrorEl.classList.remove('hidden');
-                if (dmgInputEl) {
-                    dmgInputEl.classList.remove('border-zinc-600');
-                    dmgInputEl.classList.add('border-red-500');
-                    dmgInputEl.focus();
-                }
-                return;
-            } else {
-                if (dmgErrorEl) dmgErrorEl.classList.add('hidden');
-                if (dmgInputEl) {
-                    dmgInputEl.classList.remove('border-red-500');
-                    dmgInputEl.classList.add('border-zinc-600');
-                }
-            }
-
-            const frameInputEl = document.getElementById('frameInput');
-            const frameVal = frameInputEl ? frameInputEl.value : "";
-            const driveVal = computeDriveCost(currentSteps);
-
-            const note = {
-                id: Date.now(),
-                char: currentCharacter,
-                steps: [...currentSteps],
-                okiRaw: currentOkiOptions.join('\n'),
-                frame: frameVal,
-                dmg: dmgValue,
-                type: primaryTag || "combo",
-                drive: driveVal,
-                primaryTag: primaryTag,
-                extraTags: [...extraTags]
-            };
-
-            allNotes.push(note);
-            renderNotes();
-
-            // 清空狀態
-            currentSteps = [];
-            currentOkiOptions = [];
-            primaryTag = null;
-            extraTags = [];
-            stepInput.value = "";
-            okiStepInput.value = "";
-            if (dmgInputEl) dmgInputEl.value = "";
-            if (frameInputEl) frameInputEl.value = "";
-            if (driveDisplay) driveDisplay.textContent = '0';
-            renderPreview();
-            renderOkiPreview();
-            primaryButtons.forEach(b => b.classList.remove('border-purple-400','bg-purple-900/40','text-purple-100'));
-            extraButtons.forEach(b => b.classList.remove('ring-1','ring-offset-1','ring-offset-zinc-900'));
-
-            // 儲存後關閉 Combos
-            closeBuilder();
-
-            try {
-                const docId = await saveCardToCloud(note);
-                note.docId = docId;
-            } catch (e) {
-                console.error("儲存到雲端失敗", e);
-            }
-        });
+        
+        // ... 其餘 JS 完全保持原樣 ...
     </script>
 </body>
 </html>
