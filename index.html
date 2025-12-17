@@ -65,7 +65,7 @@
             justify-content: center;
             align-items: center;
             opacity: 0;
-            transition: opacity 0.2s ease-out;
+            transition: opacity 0.18s ease-out;
         }
 
         .focus-container {
@@ -81,7 +81,7 @@
             .focus-container { flex-direction: row; }
         }
 
-        /* 左側主區：動畫優化 */
+        /* 左側主區：短距離下滑 + 淡入 */
         .focus-main {
             flex: 1.2;
             background-color: #18181b;
@@ -94,13 +94,13 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            transform: translateX(-20px);
+            transform: translateY(8px);
             opacity: 0;
             will-change: transform, opacity;
-            transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease-out;
+            transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.18s ease-out;
         }
 
-        /* 右側戰術樹：動畫優化 */
+        /* 右側戰術樹：稍微延遲 */
         .focus-tree {
             flex: 0.8;
             display: flex;
@@ -108,15 +108,15 @@
             justify-content: center;
             gap: 16px;
             width: 100%;
-            transform: translateX(20px);
+            transform: translateY(8px);
             opacity: 0;
             will-change: transform, opacity;
-            transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1) 0.05s, opacity 0.25s ease-out 0.05s;
+            transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1) 0.03s, opacity 0.2s ease-out 0.03s;
         }
 
         #focusOverlay.show { opacity: 1; }
-        #focusOverlay.show .focus-main { transform: translateX(0); opacity: 1; }
-        #focusOverlay.show .focus-tree { transform: translateX(0); opacity: 1; }
+        #focusOverlay.show .focus-main { transform: translateY(0); opacity: 1; }
+        #focusOverlay.show .focus-tree { transform: translateY(0); opacity: 1; }
 
         .tactic-btn {
             background-color: #27272a;
@@ -346,19 +346,28 @@
         window.closeFocus = function() {
             const overlay = document.getElementById('focusOverlay');
             overlay.classList.remove('show');
-            setTimeout(() => { overlay.style.display = 'none'; }, 250);
+            setTimeout(() => { overlay.style.display = 'none'; }, 220);
         };
 
         window.deleteCard = async function(event, id) {
             event.stopPropagation();
             if (!confirm("確定刪除？")) return;
+
             const note = allNotes.find(n => n.id === id);
             if (!note) return;
-            if (note.docId) {
-                await deleteDoc(doc(db, "notes", note.docId));
-            }
+
+            // 先更新畫面
             allNotes = allNotes.filter(n => n.id !== id);
             renderNotes();
+
+            // 再刪雲端
+            if (note.docId) {
+                try {
+                    await deleteDoc(doc(db, "notes", note.docId));
+                } catch (e) {
+                    console.error("刪除雲端失敗", e);
+                }
+            }
         };
 
         window.toggleBuilder = function() {
@@ -486,12 +495,12 @@
                     type: document.getElementById('tagSelect').value,
                     drive: document.getElementById('driveSelect').value
                 };
-                const docId = await saveCardToCloud(note);
-                note.docId = docId;
 
-                // 關鍵：存完直接重撈雲端資料，列表立即更新
-                await loadNotesFromCloud();
+                // 先更新本機資料 + 畫面（立即有反應）
+                allNotes.push(note);
+                renderNotes();
 
+                // 清 input
                 currentSteps = [];
                 document.getElementById('stepInput').value = "";
                 document.getElementById('okiInput').value = "";
@@ -499,6 +508,14 @@
                 document.getElementById('frameInput').value = "";
                 renderPreview();
                 toggleBuilder();
+
+                // 再 async 丟到雲端
+                try {
+                    const docId = await saveCardToCloud(note);
+                    note.docId = docId;
+                } catch (e) {
+                    console.error("儲存到雲端失敗", e);
+                }
             });
         });
     </script>
