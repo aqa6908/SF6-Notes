@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SF6 TACTICS (Final)</title>
+    <title>SF6 TACTICS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&display=swap');
@@ -116,14 +116,11 @@
             color: #9ca3af;
         }
         
-        /* 特別為 SA 設計的標籤樣式 (自動生成用) */
+        /* SA 標籤樣式 (修正為淡色風格) */
         .tag-sa {
-            background: linear-gradient(135deg, #0369a1, #2563eb); /* Sky to Blue */
-            color: white;
-            border: 1px solid #38bdf8;
-            box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
-            font-weight: bold;
-            letter-spacing: 0.5px;
+            background-color: rgba(14, 165, 233, 0.2); /* sky-500 at 20% opacity */
+            color: #7dd3fc; /* sky-300 */
+            border: 1px solid rgba(14, 165, 233, 0.4);
         }
 
         .drive-skew { transform: skewX(-12deg); }
@@ -283,7 +280,8 @@
             if (upper === 'DRC') return 'bg-green-900/40 border-green-600 text-green-100 border';
             if (upper === 'DR')  return 'bg-green-900/30 border-green-700 text-green-200 border'; 
             if (upper.includes('SA') || upper.includes('CA')) return 'bg-blue-900/40 border-blue-600 text-blue-100 border';
-            if (upper.includes('OD') || upper.includes('EX')) return 'bg-yellow-900/30 border-yellow-600 text-yellow-100 border';
+            // 修正：加入 PP 與 KK 的判定
+            if (upper.includes('OD') || upper.includes('EX') || upper.includes('PP') || upper.includes('KK')) return 'bg-yellow-900/30 border-yellow-600 text-yellow-100 border';
             return 'bg-gray-700/50 border-gray-600 text-gray-200 border';
         }
 
@@ -360,18 +358,15 @@
                 const pLabel = primaryTagLabel(note.primaryTag);
                 const extras = note.extraTags || [];
                 
-                // 1. 自動偵測 SA 標籤邏輯
                 let saTagsHtml = '';
-                // 將所有步驟轉大寫並合併成字串，方便搜尋
                 const combinedSteps = note.steps.join(' ').toUpperCase(); 
                 if (combinedSteps.includes('SA1')) saTagsHtml += `<span class="tag-pill tag-sa">SA1</span>`;
                 if (combinedSteps.includes('SA2')) saTagsHtml += `<span class="tag-pill tag-sa">SA2</span>`;
                 if (combinedSteps.includes('SA3') || combinedSteps.includes('CA')) saTagsHtml += `<span class="tag-pill tag-sa">SA3</span>`;
 
-                // 2. 組合所有標籤 HTML
                 let tagHtml = '';
                 if (pLabel) tagHtml += `<span class="tag-pill border-purple-500/50 text-purple-300 bg-purple-900/20">${pLabel}</span>`;
-                tagHtml += saTagsHtml; // 插入 SA 標籤
+                tagHtml += saTagsHtml; 
                 tagHtml += extras.map(t => `<span class="tag-pill">${extraTagLabel(t)}</span>`).join('');
 
                 let movesHtml = note.steps.map((step, idx) => {
@@ -544,7 +539,6 @@
         primaryButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 const tag = btn.getAttribute('data-tag-primary');
-                // 這裡改為: 如果點選已選中的，可以取消(變成 null)；但之後 Save 時會檢查
                 primaryTag = (primaryTag === tag) ? null : tag;
                 primaryButtons.forEach(b => {
                     if (b.getAttribute('data-tag-primary') === primaryTag) {
@@ -573,7 +567,6 @@
         });
 
         saveBtn.addEventListener('click', async () => {
-            // 1. 強制檢查起始標籤
             if (!primaryTag) {
                 alert("⚠️ 請選擇起始類型 (輕/中/重)！");
                 return; 
