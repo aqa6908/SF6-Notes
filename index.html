@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SF6 TACTICS (Remastered)</title>
+    <title>SF6 TACTICS (Final)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&display=swap');
@@ -23,7 +23,6 @@
         ::-webkit-scrollbar-track { background: #1a1a1a; }
         ::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
         
-        /* === 輸入區樣式 (保留原樣) === */
         .input-field {
             border-radius: 8px;
             font-family: 'Roboto Mono', monospace;
@@ -59,29 +58,25 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 12px; /* 這裡也要加 gap 讓 builder 預覽也不會黏住 */
+            gap: 12px; 
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* === 新版卡片樣式 === */
         .strategy-card {
             background-color: #121214;
             border: 1px solid #27272a;
-            border-radius: 0.75rem; /* rounded-xl */
+            border-radius: 0.75rem;
             overflow: hidden;
             transition: all 0.3s ease;
             cursor: pointer;
             user-select: none;
         }
-        .strategy-card:hover {
-            border-color: #52525b;
-        }
+        .strategy-card:hover { border-color: #52525b; }
         .strategy-card.expanded {
-            box-shadow: 0 10px 25px -5px rgba(88, 28, 135, 0.3); /* shadow-purple */
+            box-shadow: 0 10px 25px -5px rgba(88, 28, 135, 0.3);
             border-color: rgba(168, 85, 247, 0.4);
         }
 
-        /* 招式方塊樣式 (統一用於 Builder 與 Card) */
         .move-badge {
             padding: 0.5rem 0.75rem;
             border-radius: 0.25rem;
@@ -120,8 +115,17 @@
             border: 1px solid #52525b;
             color: #9ca3af;
         }
+        
+        /* 特別為 SA 設計的標籤樣式 (自動生成用) */
+        .tag-sa {
+            background: linear-gradient(135deg, #0369a1, #2563eb); /* Sky to Blue */
+            color: white;
+            border: 1px solid #38bdf8;
+            box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
 
-        /* Drive Gauge 斜切樣式 */
         .drive-skew { transform: skewX(-12deg); }
     </style>
 </head>
@@ -203,8 +207,8 @@
 
               <div class="builder-block">
                 <div class="flex justify-between items-center mb-3">
-                   <label class="text-sm text-purple-200 font-semibold tracking-wide">標籤分類</label>
-                   <span class="text-xs text-zinc-400">輕/中/重 擇一 · 其他可多選</span>
+                   <label class="text-sm text-purple-200 font-semibold tracking-wide">標籤分類 <span class="text-red-400">*</span></label>
+                   <span class="text-xs text-zinc-400">輕/中/重 (必選) · 其他可多選</span>
                 </div>
                 
                 <div class="flex flex-wrap gap-2 mb-3">
@@ -274,14 +278,13 @@
 
         const formatNumber = (num) => Number(num).toLocaleString('en-US');
 
-        // 核心樣式邏輯 (顏色定義)
         function getStepClass(step) {
             const upper = step.toUpperCase();
-            if (upper === 'DRC') return 'bg-green-900/40 border-green-600 text-green-100 border'; // Drive Rush Cancel
+            if (upper === 'DRC') return 'bg-green-900/40 border-green-600 text-green-100 border';
             if (upper === 'DR')  return 'bg-green-900/30 border-green-700 text-green-200 border'; 
-            if (upper.includes('SA') || upper.includes('CA')) return 'bg-blue-900/40 border-blue-600 text-blue-100 border'; // Super Art
-            if (upper.includes('OD') || upper.includes('EX')) return 'bg-yellow-900/30 border-yellow-600 text-yellow-100 border'; // Overdrive
-            return 'bg-gray-700/50 border-gray-600 text-gray-200 border'; // Normal
+            if (upper.includes('SA') || upper.includes('CA')) return 'bg-blue-900/40 border-blue-600 text-blue-100 border';
+            if (upper.includes('OD') || upper.includes('EX')) return 'bg-yellow-900/30 border-yellow-600 text-yellow-100 border';
+            return 'bg-gray-700/50 border-gray-600 text-gray-200 border';
         }
 
         function primaryTagLabel(tag) {
@@ -317,7 +320,6 @@
             `).join('');
         }
 
-        // Builder 預覽
         function renderPreview() {
             if (currentSteps.length === 0) {
                 previewDiv.innerHTML = '<span class="text-zinc-500 text-sm">輸入指令後顯示於此...</span>';
@@ -343,9 +345,6 @@
             ).join('');
         }
 
-        // ==========================================
-        //  主要修改區域：Render Notes (Accordion UI)
-        // ==========================================
         function renderNotes() {
             const charNotes = allNotes.filter(n => n.char === currentCharacter);
             if (charNotes.length === 0) {
@@ -361,12 +360,20 @@
                 const pLabel = primaryTagLabel(note.primaryTag);
                 const extras = note.extraTags || [];
                 
-                // 標籤 HTML
+                // 1. 自動偵測 SA 標籤邏輯
+                let saTagsHtml = '';
+                // 將所有步驟轉大寫並合併成字串，方便搜尋
+                const combinedSteps = note.steps.join(' ').toUpperCase(); 
+                if (combinedSteps.includes('SA1')) saTagsHtml += `<span class="tag-pill tag-sa">SA1</span>`;
+                if (combinedSteps.includes('SA2')) saTagsHtml += `<span class="tag-pill tag-sa">SA2</span>`;
+                if (combinedSteps.includes('SA3') || combinedSteps.includes('CA')) saTagsHtml += `<span class="tag-pill tag-sa">SA3</span>`;
+
+                // 2. 組合所有標籤 HTML
                 let tagHtml = '';
                 if (pLabel) tagHtml += `<span class="tag-pill border-purple-500/50 text-purple-300 bg-purple-900/20">${pLabel}</span>`;
+                tagHtml += saTagsHtml; // 插入 SA 標籤
                 tagHtml += extras.map(t => `<span class="tag-pill">${extraTagLabel(t)}</span>`).join('');
 
-                // 招式 HTML (Flex + Gap)
                 let movesHtml = note.steps.map((step, idx) => {
                     return `
                     <div class="move-badge ${getStepClass(step)}">${step}</div>
@@ -374,7 +381,6 @@
                     `;
                 }).join('');
 
-                // Drive Gauge HTML (展開後顯示)
                 const driveVal = Number(note.drive) || 0;
                 let driveHtml = '';
                 for(let i=0; i<6; i++) {
@@ -382,20 +388,16 @@
                     driveHtml += `<div class="h-2 w-3 drive-skew rounded-sm ${activeClass}"></div>`;
                 }
 
-                // Oki HTML
                 const okiLines = note.okiRaw ? note.okiRaw.split('\n').filter(l => l.trim() !== "") : [];
                 let okiHtml = okiLines.length > 0 
                     ? okiLines.map(l => `<div class="flex items-center gap-2 text-gray-300 py-1"><span class="text-green-500">➜</span>${l}</div>`).join('')
                     : '<div class="text-gray-600 text-sm">無後續設定</div>';
 
-                // 回傳完整的 HTML 字串
                 return `
                 <div id="card-${note.id}" class="strategy-card">
-                    
                     <div class="p-4" onclick="toggleCard('${note.id}')">
                         <div class="flex justify-between items-start mb-4">
                             <div class="flex flex-wrap gap-2">${tagHtml}</div>
-                            
                             <div id="dmg-preview-${note.id}" class="text-xl font-bold font-mono text-white tracking-wider">
                                 ${formatNumber(note.dmg)}
                             </div>
@@ -433,19 +435,16 @@
                         </div>
 
                         <div class="flex justify-end mt-4 pt-2 border-t border-zinc-800/50">
-                            
                             <button id="del-btn-${note.id}" onclick="event.stopPropagation(); requestDelete('${note.id}')" 
                                 class="group flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-gray-500 hover:text-red-400 hover:bg-red-950/30 transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                 <span>刪除</span>
                             </button>
-
                             <div id="del-confirm-${note.id}" class="hidden flex items-center gap-3 bg-red-950/20 px-3 py-1 rounded-lg border border-red-900/50">
                                 <span class="text-sm text-red-200 font-bold">確定刪除?</span>
                                 <button onclick="event.stopPropagation(); confirmDelete('${note.docId}')" class="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded">是</button>
                                 <button onclick="event.stopPropagation(); cancelDelete('${note.id}')" class="bg-gray-700 hover:bg-gray-600 text-white text-xs px-3 py-1.5 rounded">否</button>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -453,51 +452,38 @@
             }).join('');
         }
 
-        // ==========================================
-        //  全域函式 (給 HTML onclick 使用)
-        // ==========================================
-        
-        // 切換卡片展開/收合
         window.toggleCard = (id) => {
             const card = document.getElementById(`card-${id}`);
             const expandSection = document.getElementById(`expand-${id}`);
             const dmgPreview = document.getElementById(`dmg-preview-${id}`);
             
-            // 狀態切換
             if (expandSection.classList.contains('hidden')) {
-                // 展開
                 expandSection.classList.remove('hidden');
                 card.classList.add('expanded');
-                dmgPreview.classList.add('opacity-0'); // 隱藏頂部的簡易傷害
+                dmgPreview.classList.add('opacity-0');
             } else {
-                // 收合
                 expandSection.classList.add('hidden');
                 card.classList.remove('expanded');
                 dmgPreview.classList.remove('opacity-0');
-                // 收合時重置刪除狀態
                 window.cancelDelete(id); 
             }
         };
 
-        // 顯示刪除確認
         window.requestDelete = (id) => {
             document.getElementById(`del-btn-${id}`).classList.add('hidden');
             document.getElementById(`del-confirm-${id}`).classList.remove('hidden');
             document.getElementById(`del-confirm-${id}`).classList.add('flex');
         };
 
-        // 取消刪除
         window.cancelDelete = (id) => {
             document.getElementById(`del-btn-${id}`).classList.remove('hidden');
             document.getElementById(`del-confirm-${id}`).classList.add('hidden');
             document.getElementById(`del-confirm-${id}`).classList.remove('flex');
         };
 
-        // 執行刪除 (Firebase)
         window.confirmDelete = async (docId) => {
             if(!docId) return;
             await deleteDoc(doc(db, "notes", docId));
-            // 重新讀取並渲染
             loadNotesFromCloud(); 
         };
 
@@ -555,10 +541,10 @@
             }
         });
 
-        // 標籤按鈕邏輯 (保持不變)
         primaryButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 const tag = btn.getAttribute('data-tag-primary');
+                // 這裡改為: 如果點選已選中的，可以取消(變成 null)；但之後 Save 時會檢查
                 primaryTag = (primaryTag === tag) ? null : tag;
                 primaryButtons.forEach(b => {
                     if (b.getAttribute('data-tag-primary') === primaryTag) {
@@ -587,6 +573,12 @@
         });
 
         saveBtn.addEventListener('click', async () => {
+            // 1. 強制檢查起始標籤
+            if (!primaryTag) {
+                alert("⚠️ 請選擇起始類型 (輕/中/重)！");
+                return; 
+            }
+
             const dmgInputEl = document.getElementById('dmgInput');
             const dmgValue = dmgInputEl.value.trim();
             if (!currentSteps.length || !dmgValue) return alert("連段與傷害為必填");
@@ -605,7 +597,6 @@
 
             await addDoc(collection(db, "notes"), note);
             
-            // 重設狀態
             currentSteps = []; currentOkiOptions = []; primaryTag = null; extraTags = [];
             renderPreview(); renderOkiPreview();
             dmgInputEl.value = ""; document.getElementById('frameInput').value = "";
