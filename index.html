@@ -149,10 +149,10 @@
         .char-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px; }
         .char-btn {
             background-color: #27272a; border: 1px solid #3f3f46; color: #a1a1aa;
-            padding: 24px 0; text-align: center; cursor: pointer; border-radius: 4px;
+            padding: 24px 0; text-align: center; cursor:pointer; border-radius:4px;
         }
-        .char-btn:hover { background-color: #3f3f46; color: #fff; border-color: #d946ef; transform: scale(1.05); }
-        .char-name-display { font-family: 'Teko', sans-serif; font-size: 1.6rem; line-height: 1; letter-spacing: 1px; }
+        .char-btn:hover { background-color: #3f3f46; color:#fff; border-color:#d946ef; transform:scale(1.05);}
+        .char-name-display { font-family:'Teko',sans-serif;font-size:1.6rem;line-height:1;letter-spacing:1px;}
     </style>
 </head>
 <body class="pb-20">
@@ -186,27 +186,34 @@
 
     <div id="contentScreen" class="hidden container mx-auto mt-20 px-4 max-w-md">
         <div id="builderSection" class="hidden bg-zinc-800 p-5 rounded border border-zinc-600 mb-6 relative shadow-2xl">
-            <h2 class="text-xl mb-4 text-gray-200 border-l-4 border-purple-500 pl-3 font-bold">新對策紀錄</h2>
+            <!-- 1. 標題改成 Combos -->
+            <h2 class="text-xl mb-4 text-gray-200 border-l-4 border-purple-500 pl-3 font-bold">Combos</h2>
             
             <div id="comboPreview" class="bg-black p-4 rounded min-h-[60px] flex flex-wrap items-center mb-4 border border-zinc-600 text-lg shadow-inner">
-                <span class="text-zinc-500 text-sm" id="emptyHint">輸入指令按 Enter...</span>
+                <span class="text-zinc-500 text-sm">輸入指令按 Enter...</span>
             </div>
 
             <div class="flex gap-2 mb-4">
                 <input type="text" id="stepInput" class="flex-1 bg-zinc-700 border border-zinc-600 text-white p-3 rounded text-lg outline-none focus:border-purple-500 transition uppercase font-mono placeholder-gray-500" placeholder="如: 2MP">
             </div>
 
+            <!-- 4. 壓起身改成一格一個輸入 -->
             <div class="bg-zinc-900 p-3 rounded mb-4 border border-zinc-700">
                 <div class="flex justify-between mb-2 items-center">
-                    <label class="text-base text-blue-400 font-bold">壓起身選項 (多行輸入)</label>
+                    <label class="text-base text-blue-400 font-bold">壓起身選項</label>
                     <div class="flex items-center gap-2">
                         <label class="text-xs text-gray-400">有利幀</label>
                         <input type="text" id="frameInput" class="bg-zinc-800 text-green-400 w-16 text-center text-base border border-zinc-600 rounded font-mono" placeholder="+42">
                     </div>
                 </div>
-                <textarea id="okiInput" rows="4" class="w-full bg-zinc-800 text-gray-300 text-base p-2 border border-zinc-600 rounded focus:border-blue-500 outline-none leading-relaxed" placeholder="1. 投
-2. Shimmy (打拆投)
-3. 打亂動"></textarea>
+
+                <div id="okiPreview" class="bg-zinc-950 border border-zinc-700 rounded p-3 min-h-[52px] mb-2 flex flex-wrap items-center">
+                    <span class="text-zinc-500 text-xs">輸入選項按 Enter，例如：投、Shimmy、走回頭大腳...</span>
+                </div>
+
+                <input type="text" id="okiStepInput"
+                       class="w-full bg-zinc-800 text-gray-100 text-sm p-2 border border-zinc-600 rounded outline-none focus:border-blue-500"
+                       placeholder="如：投、Shimmy、走回頭 2MP">
             </div>
 
             <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
@@ -232,9 +239,25 @@
 
         <div id="librarySection">
             <div id="cardList" class="space-y-4 pb-20">
-                <!-- 空狀態由 JS 直接塞，不再用 classList 切換 -->
+                <!-- 空狀態由 JS 塞 -->
             </div>
         </div>
+    </div>
+
+    <!-- 3. 自訂刪除確認視窗 -->
+    <div id="deleteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
+      <div class="bg-zinc-900 border border-zinc-700 rounded-lg w-80 p-5 shadow-2xl">
+        <h3 class="text-lg font-bold text-red-400 mb-2">刪除連段？</h3>
+        <p class="text-sm text-gray-300 mb-4">這個連段會從清單中永久移除，無法復原。</p>
+        <div class="flex justify-end gap-3">
+          <button id="cancelDeleteBtn" class="px-3 py-1.5 text-sm rounded border border-zinc-600 text-gray-300 hover:bg-zinc-700">
+            取消
+          </button>
+          <button id="confirmDeleteBtn" class="px-3 py-1.5 text-sm rounded bg-red-600 text-white hover:bg-red-500">
+            確定刪除
+          </button>
+        </div>
+      </div>
     </div>
 
     <script type="module">
@@ -257,6 +280,7 @@
         let currentCharacter = ""; 
         let allNotes = [];
         let currentSteps = [];
+        let currentOkiOptions = [];
         let characters = [
             "A.K.I.", "BLANKA", "C.VIPER", "CAMMY", "CHUN-LI", 
             "DEE JAY", "DHALSIM", "E.HONDA", "ED", "ELENA", 
@@ -267,9 +291,17 @@
         ];
         characters.sort();
 
-        const previewDiv = document.getElementById('comboPreview');
-        const stepInput  = document.getElementById('stepInput');
-        const saveBtn    = document.getElementById('saveBtn');
+        const previewDiv   = document.getElementById('comboPreview');
+        const stepInput    = document.getElementById('stepInput');
+        const saveBtn      = document.getElementById('saveBtn');
+        const cardList     = document.getElementById('cardList');
+        const okiPreview   = document.getElementById('okiPreview');
+        const okiStepInput = document.getElementById('okiStepInput');
+
+        const deleteModal      = document.getElementById('deleteModal');
+        const cancelDeleteBtn  = document.getElementById('cancelDeleteBtn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        let pendingDeleteId = null;
 
         function renderCharGrid(list) {
             const grid = document.getElementById('charGrid');
@@ -293,12 +325,23 @@
             }).join('');
         }
 
+        function renderOkiPreview() {
+            if (currentOkiOptions.length === 0) {
+                okiPreview.innerHTML = '<span class="text-zinc-500 text-xs">輸入選項按 Enter，例如：投、Shimmy、走回頭大腳...</span>';
+                return;
+            }
+            okiPreview.innerHTML = currentOkiOptions.map(opt => `
+                <span class="bg-zinc-800 border border-zinc-600 text-xs text-gray-100 rounded px-2 py-1 mr-1 mb-1 inline-flex items-center">
+                  ${opt}
+                </span>
+            `).join('');
+        }
+
         function renderNotes() {
-            const list = document.getElementById('cardList');
             const charNotes = allNotes.filter(n => n.char === currentCharacter);
 
             if (charNotes.length === 0) {
-                list.innerHTML = `
+                cardList.innerHTML = `
                     <div class="text-center text-gray-500 mt-10">
                         <p class="text-xl font-bold">尚無筆記</p>
                         <p class="text-sm mt-2">點擊右上方「+ 紀錄」新增第一筆</p>
@@ -307,7 +350,7 @@
                 return;
             }
 
-            list.innerHTML = [...charNotes].reverse().map(note => {
+            cardList.innerHTML = [...charNotes].reverse().map(note => {
                 let typeLabel = "連段", typeColor = "text-blue-200 border-blue-700 bg-blue-900/50";
                 if(note.type === 'punish') { typeLabel = "確反"; typeColor = "text-red-200 border-red-700 bg-red-900/50"; }
                 if(note.type === 'setup') { typeLabel = "詐欺跳"; typeColor = "text-yellow-200 border-yellow-700 bg-yellow-900/50"; }
@@ -430,9 +473,26 @@
             setTimeout(() => { overlay.style.display = 'none'; }, 220);
         };
 
-        window.deleteCard = async function(event, id) {
+        // 3. 自訂刪除彈窗
+        window.deleteCard = function(event, id) {
             event.stopPropagation();
-            if (!confirm("確定刪除？")) return;
+            pendingDeleteId = id;
+            deleteModal.classList.remove('hidden');
+        };
+
+        cancelDeleteBtn.addEventListener('click', () => {
+            pendingDeleteId = null;
+            deleteModal.classList.add('hidden');
+        });
+
+        confirmDeleteBtn.addEventListener('click', async () => {
+            if (pendingDeleteId == null) {
+                deleteModal.classList.add('hidden');
+                return;
+            }
+            const id = pendingDeleteId;
+            pendingDeleteId = null;
+            deleteModal.classList.add('hidden');
 
             const note = allNotes.find(n => n.id === id);
             if (!note) return;
@@ -447,7 +507,7 @@
                     console.error("刪除雲端失敗", e);
                 }
             }
-        };
+        });
 
         window.toggleBuilder = function() {
             const builder = document.getElementById('builderSection');
@@ -464,13 +524,33 @@
 
         renderCharGrid(characters);
         renderPreview();
+        renderOkiPreview();
 
         stepInput.addEventListener('input', function() { this.value = this.value.toUpperCase(); });
+
+        // 2. 連段輸入支援 Backspace 刪除最後一步
         stepInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && this.value.trim() !== "") {
                 currentSteps.push(this.value.trim().toUpperCase());
                 this.value = ""; 
                 renderPreview();
+            } else if (e.key === 'Backspace' && this.value === "" && currentSteps.length > 0) {
+                currentSteps.pop();
+                renderPreview();
+                e.preventDefault();
+            }
+        });
+
+        // 4. 壓起身一格一個輸入 + Backspace 刪除最後一個
+        okiStepInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && this.value.trim() !== "") {
+                currentOkiOptions.push(this.value.trim());
+                this.value = "";
+                renderOkiPreview();
+            } else if (e.key === 'Backspace' && this.value === "" && currentOkiOptions.length > 0) {
+                currentOkiOptions.pop();
+                renderOkiPreview();
+                e.preventDefault();
             }
         });
 
@@ -483,7 +563,8 @@
                 id: Date.now(),
                 char: currentCharacter,
                 steps: [...currentSteps],
-                okiRaw: document.getElementById('okiInput').value,
+                // 用多行文字存壓起身選項，符合原本 okiRaw 設計
+                okiRaw: currentOkiOptions.join('\n'),
                 frame: document.getElementById('frameInput').value || "?",
                 dmg: document.getElementById('dmgInput').value || "0",
                 type: document.getElementById('tagSelect').value,
@@ -494,11 +575,13 @@
             renderNotes();
 
             currentSteps = [];
+            currentOkiOptions = [];
             stepInput.value = "";
-            document.getElementById('okiInput').value = "";
+            okiStepInput.value = "";
             document.getElementById('dmgInput').value = "";
             document.getElementById('frameInput').value = "";
             renderPreview();
+            renderOkiPreview();
             toggleBuilder();
 
             try {
