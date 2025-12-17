@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SF6 TACTICS</title>
+    <title>SF6 TACTICS (Remastered)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&display=swap');
@@ -23,9 +23,7 @@
         ::-webkit-scrollbar-track { background: #1a1a1a; }
         ::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
         
-        .step-arrow { color: #d946ef; font-weight: bold; margin: 0 6px; user-select: none; }
-        
-        /* === 優化後的輸入框與顯示框 (保留您的要求: 比例統一) === */
+        /* === 輸入區樣式 (保留原樣) === */
         .input-field {
             border-radius: 8px;
             font-family: 'Roboto Mono', monospace;
@@ -43,21 +41,6 @@
             transform: translateY(-1px);
         }
 
-        .display-block {
-            background: linear-gradient(135deg, rgba(55, 65, 81, 0.6) 0%, rgba(31, 41, 55, 0.8) 100%);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(75, 85, 99, 0.4);
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-family: 'Roboto Mono', monospace;
-            font-size: 1rem;
-            display: inline-flex;
-            align-items: center;
-            line-height: 1.2;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            margin: 2px 4px 2px 0;
-        }
-
         .builder-block {
             background: rgba(24, 24, 27, 0.6);
             border: 1px solid #71717a;
@@ -65,62 +48,6 @@
             padding: 20px;
             position: relative;
             backdrop-filter: blur(4px);
-        }
-
-        /* === 卡片預覽與 X 按鈕 (保留您的要求: 右上角不重疊) === */
-        .card-preview {
-            background: linear-gradient(135deg, #1e1e2e 0%, #2d2d3d 100%);
-            border: 1px solid #404046;
-            border-left: 4px solid #a855f7;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 6px 24px rgba(0,0,0,0.4);
-            min-height: 120px;
-        }
-        
-        .card-preview .delete-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            color: #ef4444;
-            font-size: 1.1rem;
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: all 0.2s;
-            z-index: 50;
-        }
-        .card-preview:hover .delete-btn { opacity: 1; }
-        .card-preview .delete-btn:hover {
-            background: #ef4444;
-            color: white;
-            transform: scale(1.1);
-        }
-
-        .card-stats {
-            background: rgba(17, 24, 39, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid #374151;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-            width: 90px;
-            position: absolute;
-            top: 50%;
-            right: 16px;
-            transform: translateY(-50%);
-            z-index: 10;
         }
 
         .preview-container {
@@ -132,96 +59,43 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 8px;
+            gap: 12px; /* 這裡也要加 gap 讓 builder 預覽也不會黏住 */
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* === ！！！重要：完全還原您原始的 Focus Overlay CSS ！！！ === */
-        #focusOverlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(8px);
-            z-index: 9999;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.12s ease-out;
+        /* === 新版卡片樣式 === */
+        .strategy-card {
+            background-color: #121214;
+            border: 1px solid #27272a;
+            border-radius: 0.75rem; /* rounded-xl */
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+        .strategy-card:hover {
+            border-color: #52525b;
+        }
+        .strategy-card.expanded {
+            box-shadow: 0 10px 25px -5px rgba(88, 28, 135, 0.3); /* shadow-purple */
+            border-color: rgba(168, 85, 247, 0.4);
         }
 
-        .focus-container {
-            width: 95%;
-            max-width: 1200px;
-            min-height: 60vh;
-            display: flex;
-            gap: 40px;
-            align-items: center;
-            flex-direction: column; 
-        }
-        @media (min-width: 768px) {
-            .focus-container { flex-direction: row; }
-        }
-
-        .focus-main {
-            flex: 1.2;
-            background: radial-gradient(circle at top left, #3b0764 0, #18181b 45%, #020617 100%);
-            border: 1px solid #3f3f46;
-            border-left: 6px solid #a855f7;
-            padding: 40px;
-            border-radius: 14px;
-            box-shadow: 0 0 60px rgba(0,0,0,0.9);
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            transform: translateY(6px);
-            opacity: 0;
-            will-change: transform, opacity;
-            transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.14s ease-out;
-        }
-
-        .focus-tree {
-            flex: 0.8;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 16px;
-            width: 100%;
-            transform: translateY(6px);
-            opacity: 0;
-            will-change: transform, opacity;
-            transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1) 0.02s, opacity 0.16s ease-out 0.02s;
-        }
-
-        #focusOverlay.show { opacity: 1; }
-        #focusOverlay.show .focus-main { transform: translateY(0); opacity: 1; }
-        #focusOverlay.show .focus-tree { transform: translateY(0); opacity: 1; }
-        /* === ！！！還原結束！！！ === */
-
-        .tactic-btn {
-            background-color: #27272a;
-            padding: 16px;
-            border-radius: 8px;
-            border: 1px solid #444;
-            color: #e4e4e7;
+        /* 招式方塊樣式 (統一用於 Builder 與 Card) */
+        .move-badge {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.25rem;
+            font-weight: 700;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.125rem;
             display: flex;
             align-items: center;
-            font-size: 1.05rem;
-            box-shadow: 0 3px 5px rgba(0,0,0,0.3);
+            justify-content: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            backdrop-filter: blur(4px);
+            border-width: 1px;
         }
-        .tactic-btn:hover {
-            border-color: #444;
-            background-color: #27272a;
-            transform: none;
-            color: #e4e4e7;
-        }
-        .tactic-arrow { color: #22c55e; margin-right: 16px; font-weight: bold; font-size: 1.3rem; }
-
-        .drive-box { width: 12px; height: 12px; margin-right: 3px; transform: skewX(-15deg); display: inline-block; }
-        .drive-on { background-color: #22c55e; box-shadow: 0 0 5px #22c55e; }
-        .drive-off { background-color: #333; }
-
+        
         .char-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px; }
         .char-btn {
             background-color: #27272a; border: 1px solid #3f3f46; color: #a1a1aa;
@@ -236,45 +110,22 @@
             background-color: #020617;
         }
 
-        .card-tag-primary, .card-tag-extra {
+        /* 標籤樣式 */
+        .tag-pill {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            text-align: center;
-            margin: 2px;
-        }
-        .card-tag-primary {
-            background: linear-gradient(135deg, #9333ea, #a855f7);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 16px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            box-shadow: 0 2px 6px rgba(147, 51, 234, 0.3);
-            min-width: 60px;
-        }
-        .card-tag-extra {
-            background: rgba(107, 114, 128, 0.3);
-            color: #d1d5db;
-            padding: 5px 10px;
-            border-radius: 12px;
+            padding: 2px 8px;
+            border-radius: 9999px;
             font-size: 0.75rem;
-            border: 1px solid #6b7280;
-            min-width: 48px;
+            border: 1px solid #52525b;
+            color: #9ca3af;
         }
+
+        /* Drive Gauge 斜切樣式 */
+        .drive-skew { transform: skewX(-12deg); }
     </style>
 </head>
 <body class="pb-20">
-
-    <div id="focusOverlay" onclick="closeFocus()">
-        <div class="focus-container" onclick="event.stopPropagation()">
-            <div class="focus-main" id="focusMainContent"></div>
-            <div class="focus-tree" id="focusTreeContent"></div>
-        </div>
-        <div class="absolute bottom-8 text-gray-500 text-xs animate-pulse cursor-pointer hover:text-white">
-            點擊空白處關閉 / ESC
-        </div>
-    </div>
 
     <div id="navBar" class="hidden fixed top-0 w-full bg-zinc-900/95 backdrop-blur border-b border-zinc-700 p-3 z-50 flex justify-between items-center shadow-lg">
         <button onclick="goBackToSelect()" class="text-gray-400 hover:text-white flex items-center text-sm font-bold transition">
@@ -294,7 +145,8 @@
     </div>
 
     <div id="contentScreen" class="hidden container mx-auto mt-20 px-4 max-w-md">
-        <div id="builderSection" class="hidden mb-6 relative">
+        
+        <div id="builderSection" class="hidden mb-6 relative animate-[fadeIn_0.2s_ease-out]">
           <div class="builder-shell rounded-xl border border-zinc-700 shadow-2xl overflow-hidden">
             <div class="border-b border-zinc-700 px-5 py-3 flex items-center justify-between bg-zinc-950/70">
               <h2 class="text-lg text-purple-100 font-bold flex items-center gap-2">
@@ -324,7 +176,7 @@
                         <input type="text" id="frameInput" class="input-field !w-20 !py-1 !px-2 text-center text-green-300" placeholder="+42">
                     </div>
                 </div>
-                <div id="okiPreview" class="preview-container mb-3">
+                <div id="okiPreview" class="preview-container mb-3 !gap-2 !block">
                     <span class="text-zinc-500 text-sm">點擊 Enter 增加選項...</span>
                 </div>
                 <input type="text" id="okiStepInput" class="input-field" placeholder="例如: 投, Shimmy...">
@@ -356,14 +208,14 @@
                 </div>
                 
                 <div class="flex flex-wrap gap-2 mb-3">
-                    <button data-tag-primary="light"  class="tag-primary px-4 py-2 text-sm rounded-full border border-zinc-600 text-zinc-100 bg-zinc-900/50 hover:border-purple-400 hover:bg-purple-900/30 transition-all">輕起始</button>
-                    <button data-tag-primary="medium" class="tag-primary px-4 py-2 text-sm rounded-full border border-zinc-600 text-zinc-100 bg-zinc-900/50 hover:border-purple-400 hover:bg-purple-900/30 transition-all">中起始</button>
-                    <button data-tag-primary="heavy"  class="tag-primary px-4 py-2 text-sm rounded-full border border-zinc-600 text-zinc-100 bg-zinc-900/50 hover:border-purple-400 hover:bg-purple-900/30 transition-all">重起始</button>
+                    <button data-tag-primary="light"  class="tag-primary px-4 py-2 text-sm rounded-full border border-zinc-600 text-zinc-100 bg-zinc-900/50 transition-all">輕起始</button>
+                    <button data-tag-primary="medium" class="tag-primary px-4 py-2 text-sm rounded-full border border-zinc-600 text-zinc-100 bg-zinc-900/50 transition-all">中起始</button>
+                    <button data-tag-primary="heavy"  class="tag-primary px-4 py-2 text-sm rounded-full border border-zinc-600 text-zinc-100 bg-zinc-900/50 transition-all">重起始</button>
                 </div>
                 <div class="flex flex-wrap gap-2">
-                    <button data-tag-extra="corner" class="tag-extra px-3 py-2 text-xs rounded-full border border-zinc-700 text-amber-200 bg-amber-900/30 hover:border-amber-400 hover:bg-amber-900/50 transition-all">版邊限定</button>
-                    <button data-tag-extra="punish" class="tag-extra px-3 py-2 text-xs rounded-full border border-zinc-700 text-red-200 bg-red-900/30 hover:border-red-400 hover:bg-red-900/50 transition-all">確反</button>
-                    <button data-tag-extra="kill"   class="tag-extra px-3 py-2 text-xs rounded-full border border-zinc-700 text-emerald-200 bg-emerald-900/30 hover:border-emerald-400 hover:bg-emerald-900/50 transition-all">斬殺</button>
+                    <button data-tag-extra="corner" class="tag-extra px-3 py-2 text-xs rounded-full border border-zinc-700 text-amber-200 bg-amber-900/30 transition-all">版邊限定</button>
+                    <button data-tag-extra="punish" class="tag-extra px-3 py-2 text-xs rounded-full border border-zinc-700 text-red-200 bg-red-900/30 transition-all">確反</button>
+                    <button data-tag-extra="kill"    class="tag-extra px-3 py-2 text-xs rounded-full border border-zinc-700 text-emerald-200 bg-emerald-900/30 transition-all">斬殺</button>
                 </div>
               </div>
 
@@ -382,17 +234,6 @@
         <div id="librarySection">
             <div id="cardList" class="space-y-4 pb-20"></div>
         </div>
-    </div>
-
-    <div id="deleteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[99999] hidden">
-      <div class="bg-zinc-900 border border-zinc-700 rounded-xl w-80 p-6 shadow-2xl">
-        <h3 class="text-xl font-bold text-red-400 mb-3">刪除連段？</h3>
-        <p class="text-sm text-gray-300 mb-5">這個連段會從清單中永久移除，無法復原。</p>
-        <div class="flex justify-end gap-3">
-          <button id="cancelDeleteBtn" class="px-4 py-2 text-sm rounded-lg border border-zinc-600 text-gray-300 hover:bg-zinc-700 transition-all">取消</button>
-          <button id="confirmDeleteBtn" class="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-500 shadow-lg transition-all">確定刪除</button>
-        </div>
-      </div>
     </div>
 
     <script type="module">
@@ -421,32 +262,26 @@
 
         let characters = ["A.K.I.", "BLANKA", "C.VIPER", "CAMMY", "CHUN-LI", "DEE JAY", "DHALSIM", "E.HONDA", "ED", "ELENA", "GOUKI", "GUILE", "JAMIE", "JP", "JURI", "KEN", "KIMBERLY", "LILY", "LUKE", "MAI", "MANON", "MARISA", "RASHID", "RYU", "TERRY", "VEGA", "ZANGIEF"].sort();
 
-        const previewDiv   = document.getElementById('comboPreview');
-        const stepInput    = document.getElementById('stepInput');
-        const saveBtn      = document.getElementById('saveBtn');
-        const cardList     = document.getElementById('cardList');
-        const okiPreview   = document.getElementById('okiPreview');
-        const okiStepInput = document.getElementById('okiStepInput');
-        const driveDisplay = document.getElementById('driveDisplay');
-        const deleteModal      = document.getElementById('deleteModal');
-        const cancelDeleteBtn  = document.getElementById('cancelDeleteBtn');
-        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const previewDiv    = document.getElementById('comboPreview');
+        const stepInput     = document.getElementById('stepInput');
+        const saveBtn       = document.getElementById('saveBtn');
+        const cardList      = document.getElementById('cardList');
+        const okiPreview    = document.getElementById('okiPreview');
+        const okiStepInput  = document.getElementById('okiStepInput');
+        const driveDisplay  = document.getElementById('driveDisplay');
         const primaryButtons = document.querySelectorAll('[data-tag-primary]');
         const extraButtons   = document.querySelectorAll('[data-tag-extra]');
-        let pendingDeleteId = null;
 
-        // 千分位格式化
-        const formatNumber = (num) => {
-            return Number(num).toLocaleString('en-US');
-        };
+        const formatNumber = (num) => Number(num).toLocaleString('en-US');
 
-        function getStepStyle(step) {
+        // 核心樣式邏輯 (顏色定義)
+        function getStepClass(step) {
             const upper = step.toUpperCase();
-            if (upper === 'DRC') return 'display-block bg-gradient-to-r from-green-900/70 to-green-800/70 text-green-200 border border-green-500/60 shadow-green-500/30';
-            if (upper === 'DR') return 'display-block bg-gradient-to-r from-green-900/60 to-green-800/60 text-green-200 border border-green-500/50 shadow-green-500/25';
-            if (upper.includes('SA')) return 'display-block bg-gradient-to-r from-sky-900/70 to-sky-800/70 text-sky-200 border border-sky-500/60 shadow-sky-500/30';
-            if (upper.includes('PP') || upper.includes('KK')) return 'display-block bg-gradient-to-r from-amber-900/70 to-amber-800/70 text-amber-200 border border-amber-500/60 shadow-amber-500/30';
-            return 'display-block bg-gradient-to-r from-zinc-700/70 to-zinc-600/70 text-white border border-zinc-500/60 shadow-zinc-500/30';
+            if (upper === 'DRC') return 'bg-green-900/40 border-green-600 text-green-100 border'; // Drive Rush Cancel
+            if (upper === 'DR')  return 'bg-green-900/30 border-green-700 text-green-200 border'; 
+            if (upper.includes('SA') || upper.includes('CA')) return 'bg-blue-900/40 border-blue-600 text-blue-100 border'; // Super Art
+            if (upper.includes('OD') || upper.includes('EX')) return 'bg-yellow-900/30 border-yellow-600 text-yellow-100 border'; // Overdrive
+            return 'bg-gray-700/50 border-gray-600 text-gray-200 border'; // Normal
         }
 
         function primaryTagLabel(tag) {
@@ -469,7 +304,7 @@
                 const s = raw.toUpperCase();
                 if (s === 'DR') total += 1;
                 if (s === 'DRC') total += 3;
-                if (s.includes('PP') || s.includes('KK')) total += 2;
+                if (s.includes('OD') || s.includes('EX') || s.includes('PP') || s.includes('KK')) total += 2;
             }
             return Math.max(0, Math.min(6, total));
         }
@@ -482,6 +317,7 @@
             `).join('');
         }
 
+        // Builder 預覽
         function renderPreview() {
             if (currentSteps.length === 0) {
                 previewDiv.innerHTML = '<span class="text-zinc-500 text-sm">輸入指令後顯示於此...</span>';
@@ -489,8 +325,8 @@
                 return;
             }
             previewDiv.innerHTML = currentSteps.map((step, idx) => {
-                return `<span class="${getStepStyle(step)}">${step}</span>` +
-                       (idx < currentSteps.length-1 ? `<span class="step-arrow text-lg">➜</span>` : '');
+                return `<span class="move-badge ${getStepClass(step)} text-sm">${step}</span>` +
+                       (idx < currentSteps.length-1 ? `<span class="text-purple-500 font-bold">➜</span>` : '');
             }).join('');
             driveDisplay.textContent = computeDriveCost(currentSteps);
         }
@@ -500,51 +336,170 @@
                 okiPreview.innerHTML = '<span class="text-zinc-500 text-sm">點擊 Enter 增加選項...</span>';
                 return;
             }
-            okiPreview.innerHTML = currentOkiOptions.map(opt => `<span class="display-block">${opt}</span>`).join('');
+            okiPreview.innerHTML = currentOkiOptions.map(opt => 
+                `<div class="w-full bg-zinc-800/50 border border-zinc-700 rounded px-3 py-2 text-sm text-gray-300 flex items-center">
+                    <span class="text-green-500 mr-2">➜</span>${opt}
+                 </div>`
+            ).join('');
         }
 
+        // ==========================================
+        //  主要修改區域：Render Notes (Accordion UI)
+        // ==========================================
         function renderNotes() {
             const charNotes = allNotes.filter(n => n.char === currentCharacter);
             if (charNotes.length === 0) {
                 cardList.innerHTML = `
-                    <div class="text-center text-gray-500 mt-10">
+                    <div class="text-center text-gray-500 mt-10 border border-dashed border-zinc-800 p-10 rounded-xl">
                         <p class="text-xl font-bold">尚無筆記</p>
                         <p class="text-sm mt-2">點擊右上方「+ 紀錄」新增第一筆</p>
-                    </div>
-                `;
+                    </div>`;
                 return;
             }
+            
             cardList.innerHTML = [...charNotes].reverse().map(note => {
                 const pLabel = primaryTagLabel(note.primaryTag);
                 const extras = note.extraTags || [];
                 
+                // 標籤 HTML
                 let tagHtml = '';
-                if (pLabel) tagHtml += `<span class="card-tag-primary">${pLabel}</span>`;
-                tagHtml += extras.map(t => `<span class="card-tag-extra">${extraTagLabel(t)}</span>`).join('');
+                if (pLabel) tagHtml += `<span class="tag-pill border-purple-500/50 text-purple-300 bg-purple-900/20">${pLabel}</span>`;
+                tagHtml += extras.map(t => `<span class="tag-pill">${extraTagLabel(t)}</span>`).join('');
 
-                let flowHtml = note.steps.map((step, idx) => {
-                    const style = getStepStyle(step).replace('display-block', 'inline-block');
-                    return `<span class="${style} text-sm px-2 py-1 mr-1.5">${step}</span>` +
-                           (idx < note.steps.length-1 ? `<span class="step-arrow text-sm">➜</span>` : '');
+                // 招式 HTML (Flex + Gap)
+                let movesHtml = note.steps.map((step, idx) => {
+                    return `
+                    <div class="move-badge ${getStepClass(step)}">${step}</div>
+                    ${idx < note.steps.length-1 ? '<span class="text-purple-500 font-bold text-lg">➜</span>' : ''}
+                    `;
                 }).join('');
 
+                // Drive Gauge HTML (展開後顯示)
+                const driveVal = Number(note.drive) || 0;
+                let driveHtml = '';
+                for(let i=0; i<6; i++) {
+                    const activeClass = i < driveVal ? 'bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.8)]' : 'bg-gray-700';
+                    driveHtml += `<div class="h-2 w-3 drive-skew rounded-sm ${activeClass}"></div>`;
+                }
+
+                // Oki HTML
+                const okiLines = note.okiRaw ? note.okiRaw.split('\n').filter(l => l.trim() !== "") : [];
+                let okiHtml = okiLines.length > 0 
+                    ? okiLines.map(l => `<div class="flex items-center gap-2 text-gray-300 py-1"><span class="text-green-500">➜</span>${l}</div>`).join('')
+                    : '<div class="text-gray-600 text-sm">無後續設定</div>';
+
+                // 回傳完整的 HTML 字串
                 return `
-                    <div class="card-preview group relative" onclick="openFocus(${note.id})" style="padding-right: 110px;">
-                        <div class="delete-btn" onclick="deleteCard(event, ${note.id})">×</div>
-                        <div class="card-stats">
-                            <div class="text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">DAMAGE</div>
-                            <div class="text-2xl font-bold text-white mono-font mb-1.5">${formatNumber(note.dmg)}</div>
-                            <div class="text-[10px] text-gray-400 uppercase tracking-wider">DRIVE</div>
-                            <div class="text-lg text-emerald-400 font-mono">${note.drive}</div>
+                <div id="card-${note.id}" class="strategy-card">
+                    
+                    <div class="p-4" onclick="toggleCard('${note.id}')">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex flex-wrap gap-2">${tagHtml}</div>
+                            
+                            <div id="dmg-preview-${note.id}" class="text-xl font-bold font-mono text-white tracking-wider">
+                                ${formatNumber(note.dmg)}
+                            </div>
                         </div>
-                        <div class="pt-2 space-y-2">
-                            <div class="flex flex-wrap gap-1.5">${tagHtml}</div>
-                            <div class="text-xs text-zinc-300 mono-font bg-zinc-800/60 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-zinc-600/40 shadow-lg overflow-hidden">${flowHtml}</div>
+
+                        <div class="flex flex-wrap items-center gap-3">
+                            ${movesHtml}
                         </div>
                     </div>
+
+                    <div id="expand-${note.id}" class="hidden bg-[#1a1a1e] border-t border-zinc-800 p-4 animate-[fadeIn_0.2s_ease-out]">
+                        <div class="flex justify-between items-end">
+                            <div class="flex flex-col gap-2 w-full">
+                                <div class="flex justify-between items-end border-b border-zinc-700/50 pb-2 mb-2">
+                                    <div>
+                                        <div class="text-xs text-gray-500 font-mono tracking-widest">DAMAGE</div>
+                                        <div class="text-4xl font-bold font-mono text-white">${formatNumber(note.dmg)}</div>
+                                    </div>
+                                    <div class="text-right">
+                                         <div class="text-xs text-gray-500 mb-1">ADVANTAGE</div>
+                                         <div class="text-2xl font-bold font-mono text-blue-300">${note.frame}F</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="text-xs text-gray-500">DRIVE</span>
+                                    <div class="flex gap-0.5">${driveHtml}</div>
+                                </div>
+
+                                <div class="mt-2 bg-zinc-900/50 rounded p-3 border border-zinc-700/50">
+                                    <div class="text-xs text-gray-500 mb-2 uppercase tracking-wider">Oki / Setup</div>
+                                    ${okiHtml}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end mt-4 pt-2 border-t border-zinc-800/50">
+                            
+                            <button id="del-btn-${note.id}" onclick="event.stopPropagation(); requestDelete('${note.id}')" 
+                                class="group flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-gray-500 hover:text-red-400 hover:bg-red-950/30 transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                <span>刪除</span>
+                            </button>
+
+                            <div id="del-confirm-${note.id}" class="hidden flex items-center gap-3 bg-red-950/20 px-3 py-1 rounded-lg border border-red-900/50">
+                                <span class="text-sm text-red-200 font-bold">確定刪除?</span>
+                                <button onclick="event.stopPropagation(); confirmDelete('${note.docId}')" class="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded">是</button>
+                                <button onclick="event.stopPropagation(); cancelDelete('${note.id}')" class="bg-gray-700 hover:bg-gray-600 text-white text-xs px-3 py-1.5 rounded">否</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
                 `;
             }).join('');
         }
+
+        // ==========================================
+        //  全域函式 (給 HTML onclick 使用)
+        // ==========================================
+        
+        // 切換卡片展開/收合
+        window.toggleCard = (id) => {
+            const card = document.getElementById(`card-${id}`);
+            const expandSection = document.getElementById(`expand-${id}`);
+            const dmgPreview = document.getElementById(`dmg-preview-${id}`);
+            
+            // 狀態切換
+            if (expandSection.classList.contains('hidden')) {
+                // 展開
+                expandSection.classList.remove('hidden');
+                card.classList.add('expanded');
+                dmgPreview.classList.add('opacity-0'); // 隱藏頂部的簡易傷害
+            } else {
+                // 收合
+                expandSection.classList.add('hidden');
+                card.classList.remove('expanded');
+                dmgPreview.classList.remove('opacity-0');
+                // 收合時重置刪除狀態
+                window.cancelDelete(id); 
+            }
+        };
+
+        // 顯示刪除確認
+        window.requestDelete = (id) => {
+            document.getElementById(`del-btn-${id}`).classList.add('hidden');
+            document.getElementById(`del-confirm-${id}`).classList.remove('hidden');
+            document.getElementById(`del-confirm-${id}`).classList.add('flex');
+        };
+
+        // 取消刪除
+        window.cancelDelete = (id) => {
+            document.getElementById(`del-btn-${id}`).classList.remove('hidden');
+            document.getElementById(`del-confirm-${id}`).classList.add('hidden');
+            document.getElementById(`del-confirm-${id}`).classList.remove('flex');
+        };
+
+        // 執行刪除 (Firebase)
+        window.confirmDelete = async (docId) => {
+            if(!docId) return;
+            await deleteDoc(doc(db, "notes", docId));
+            // 重新讀取並渲染
+            loadNotesFromCloud(); 
+        };
 
         window.selectCharacter = async (name) => {
             currentCharacter = name;
@@ -600,14 +555,11 @@
             }
         });
 
+        // 標籤按鈕邏輯 (保持不變)
         primaryButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 const tag = btn.getAttribute('data-tag-primary');
-                if (primaryTag === tag) {
-                    primaryTag = null;
-                } else {
-                    primaryTag = tag;
-                }
+                primaryTag = (primaryTag === tag) ? null : tag;
                 primaryButtons.forEach(b => {
                     if (b.getAttribute('data-tag-primary') === primaryTag) {
                         b.classList.add('border-purple-400','bg-purple-900/50','text-purple-100','ring-2','ring-purple-400/50');
@@ -651,9 +603,6 @@
                 extraTags: [...extraTags]
             };
 
-            allNotes.push(note);
-            renderNotes();
-            closeBuilder();
             await addDoc(collection(db, "notes"), note);
             
             // 重設狀態
@@ -662,92 +611,9 @@
             dmgInputEl.value = ""; document.getElementById('frameInput').value = "";
             primaryButtons.forEach(b => b.classList.remove('border-purple-400','bg-purple-900/50','text-purple-100','ring-2','ring-purple-400/50'));
             extraButtons.forEach(b => b.classList.remove('ring-2','ring-offset-1','ring-offset-zinc-900','bg-opacity-60'));
+            closeBuilder();
+            loadNotesFromCloud();
         });
-
-        window.deleteCard = (e, id) => {
-            e.stopPropagation();
-            pendingDeleteId = id;
-            deleteModal.classList.remove('hidden');
-        };
-
-        confirmDeleteBtn.addEventListener('click', async () => {
-            const note = allNotes.find(n => n.id === pendingDeleteId);
-            if (note?.docId) await deleteDoc(doc(db, "notes", note.docId));
-            allNotes = allNotes.filter(n => n.id !== pendingDeleteId);
-            renderNotes();
-            deleteModal.classList.add('hidden');
-        });
-
-        cancelDeleteBtn.addEventListener('click', () => deleteModal.classList.add('hidden'));
-
-        /* === ！！！重要：完全還原您原始的 Focus Overlay JS 邏輯 ！！！ === */
-        window.openFocus = function(id) {
-            const note = allNotes.find(n => n.id === id);
-            if (!note) return;
-
-            const overlay = document.getElementById('focusOverlay');
-            const main = document.getElementById('focusMainContent');
-            const tree = document.getElementById('focusTreeContent');
-            
-            let driveHtml = '';
-            const driveVal = Number(note.drive) || 0;
-            for(let i=0; i<6; i++) driveHtml += `<span class="drive-box ${i < driveVal ? 'drive-on' : 'drive-off'}"></span>`;
-            
-            let flowHtml = note.steps.map((step, idx) => {
-                const style = getStepStyle(step).replace('display-block', 'inline-block');
-                return `<span class="${style} text-3xl px-5 py-3 mx-3">${step}</span>` +
-                       (idx < note.steps.length-1 ? `<span class="step-arrow text-4xl">➜</span>` : '');
-            }).join('');
-
-            main.innerHTML = `
-                <div class="flex justify-between items-end border-b border-gray-700 pb-4 mb-6">
-                    <div>
-                        <div class="text-sm text-gray-400 mb-1">DRIVE COST</div>
-                        <div>${driveHtml}</div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-sm text-gray-400">DAMAGE</div>
-                        <div class="text-5xl font-bold text-white mono-font">${formatNumber(note.dmg)}</div>
-                    </div>
-                </div>
-                <div class="text-white mono-font leading-relaxed mb-6 text-xl">${flowHtml}</div>
-                <div class="flex items-center gap-3">
-                    <span class="bg-blue-900/40 text-blue-200 border border-blue-900/50 px-5 py-3 rounded-xl font-bold mono-font text-2xl backdrop-blur-sm">${note.frame}F</span>
-                    <span class="text-gray-400 text-xs tracking-[0.2em] uppercase">ADVANTAGE</span>
-                </div>
-            `;
-
-            const okiLines = note.okiRaw ? note.okiRaw.split('\n').filter(l => l.trim() !== "") : [];
-            if (okiLines.length > 0) {
-                tree.innerHTML = okiLines.map(line => `
-                    <div class="tactic-btn">
-                        <span class="tactic-arrow">➜</span>
-                        <span>${line}</span>
-                    </div>
-                `).join('');
-            } else {
-                tree.innerHTML = `<div class="text-gray-500 text-center text-xl">無後續設定</div>`;
-            }
-
-            overlay.style.display = 'flex';
-            setTimeout(() => { overlay.classList.add('show'); }, 10);
-        };
-
-        window.closeFocus = function() {
-            const overlay = document.getElementById('focusOverlay');
-            overlay.classList.remove('show');
-            setTimeout(() => { overlay.style.display = 'none'; }, 140);
-        };
-
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                const overlay = document.getElementById('focusOverlay');
-                if (overlay && overlay.style.display === 'flex') {
-                    closeFocus();
-                }
-            }
-        });
-        /* === ！！！還原結束！！！ === */
 
         renderCharGrid(characters);
     </script>
