@@ -11,7 +11,7 @@
         
         body { 
             font-family: 'Microsoft JhengHei', 'Microsoft YaHei', sans-serif; 
-            background-color: #0f0f11; 
+            background-color: #050509; 
             color: #d4d4d8; 
             overflow-y: scroll;
         }
@@ -54,7 +54,7 @@
             border-left-color: #d946ef;
         }
 
-        /* Overlay：加快淡入淡出 */
+        /* Overlay：快一點 */
         #focusOverlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -83,12 +83,12 @@
 
         .focus-main {
             flex: 1.2;
-            background-color: #18181b;
-            border: 1px solid #333;
+            background: radial-gradient(circle at top left, #3b0764 0, #18181b 45%, #020617 100%);
+            border: 1px solid #3f3f46;
             border-left: 6px solid #a855f7;
             padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            border-radius: 14px;
+            box-shadow: 0 0 60px rgba(0,0,0,0.9);
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -127,7 +127,7 @@
             font-size: 1.05rem;
             box-shadow: 0 3px 5px rgba(0,0,0,0.3);
         }
-        /* 4. 移除 hover 強調動畫 */
+        /* 4. 無 hover 強調 */
         .tactic-btn:hover {
             border-color: #444;
             background-color: #27272a;
@@ -136,7 +136,7 @@
         }
         .tactic-arrow { color: #22c55e; margin-right: 16px; font-weight: bold; font-size: 1.3rem; }
 
-        /* 2. 刪除鍵位置微調，避免與 Damage 重疊 */
+        /* 刪除鍵避免重疊 */
         .delete-btn {
             position: absolute;
             top: 6px;
@@ -161,6 +161,15 @@
         }
         .char-btn:hover { background-color:#3f3f46;color:#fff;border-color:#d946ef;transform:scale(1.05);}
         .char-name-display { font-family:'Teko',sans-serif;font-size:1.6rem;line-height:1;letter-spacing:1px;}
+
+        /* Builder 背景加一點格線感 */
+        .builder-shell {
+            background-image:
+                linear-gradient(to right, rgba(63,63,70,0.3) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(63,63,70,0.3) 1px, transparent 1px);
+            background-size: 24px 24px;
+            background-color: #020617;
+        }
     </style>
 </head>
 <body class="pb-20">
@@ -186,17 +195,17 @@
     </div>
 
     <div id="charSelectScreen" class="container mx-auto mt-6 px-2 max-w-2xl animate-[fadeIn_0.5s_ease-out]">
-        <div class="text-center mb-6 sticky top-0 bg-[#0f0f11] z-40 py-4 border-b border-zinc-800">
+        <div class="text-center mb-6 sticky top-0 bg-[#050509] z-40 py-4 border-b border-zinc-800">
             <h1 class="text-5xl text-white fight-font mb-2">CHARACTER SELECT</h1>
         </div>
         <div class="char-grid" id="charGrid"></div>
     </div>
 
     <div id="contentScreen" class="hidden container mx-auto mt-20 px-4 max-w-md">
-        <!-- 1. Builder 區塊視覺化：增加分段與背景層次 -->
+        <!-- Builder 區塊視覺化 -->
         <div id="builderSection" class="hidden mb-6 relative">
-          <div class="bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 rounded-xl border border-zinc-700 shadow-2xl overflow-hidden">
-            <div class="border-b border-zinc-700 px-5 py-3 flex items-center justify-between bg-zinc-950/60">
+          <div class="builder-shell rounded-xl border border-zinc-700 shadow-2xl overflow-hidden">
+            <div class="border-b border-zinc-700 px-5 py-3 flex items-center justify-between bg-zinc-950/70">
               <h2 class="text-lg text-gray-100 font-bold flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.8)]"></span>
                 Combos
@@ -204,9 +213,9 @@
               <span class="text-[10px] uppercase tracking-[0.2em] text-zinc-500">BUILDER</span>
             </div>
 
-            <div class="p-5 space-y-4">
+            <div class="p-5 space-y-4 bg-zinc-950/70">
               <!-- Combo Builder 區塊 -->
-              <div class="bg-zinc-900/80 border border-zinc-700 rounded-lg p-4">
+              <div class="bg-zinc-900/90 border border-zinc-700 rounded-lg p-4">
                 <div class="flex items-center justify-between mb-2">
                   <span class="text-xs text-zinc-400 font-semibold">連段步驟</span>
                   <span class="text-[10px] text-zinc-500">ENTER 新增 · Backspace 刪除</span>
@@ -220,9 +229,12 @@
               </div>
 
               <!-- 壓起身選項區塊 -->
-              <div class="bg-zinc-900/80 border border-zinc-700 rounded-lg p-4">
+              <div class="bg-zinc-900/90 border border-zinc-700 rounded-lg p-4">
                 <div class="flex justify-between mb-2 items-center">
-                    <label class="text-sm text-blue-400 font-bold">壓起身選項</label>
+                    <div>
+                      <label class="text-sm text-blue-400 font-bold">壓起身選項</label>
+                      <div class="text-[10px] text-zinc-500 mt-0.5">ENTER 新增 · Backspace 刪除</div>
+                    </div>
                     <div class="flex items-center gap-2">
                         <label class="text-[10px] text-gray-400">有利幀</label>
                         <input type="text" id="frameInput" class="bg-zinc-800 text-green-400 w-16 text-center text-sm border border-zinc-600 rounded font-mono" placeholder="+42">
@@ -238,20 +250,37 @@
                        placeholder="如：投、Shimmy、走回頭 2MP">
               </div>
 
-              <!-- Tag / Drive / Damage -->
-              <div class="flex gap-2 overflow-x-auto pb-1">
-                  <select id="tagSelect" class="bg-zinc-800 text-xs p-2 rounded text-white border border-zinc-600 outline-none">
-                      <option value="combo">連段 Combo</option>
-                      <option value="punish">確反 Punish</option>
-                      <option value="setup">詐欺跳 Setup</option>
-                  </select>
-                  <select id="driveSelect" class="bg-zinc-800 text-xs p-2 rounded text-white border border-zinc-600 outline-none">
-                      <option value="0">0 氣</option>
-                      <option value="1">1 氣</option>
-                      <option value="3">3 氣 (DR)</option>
-                      <option value="6">Burnout</option>
-                  </select>
-                  <input type="number" id="dmgInput" class="bg-zinc-800 text-white w-24 text-xs p-2 border border-zinc-600 rounded outline-none" placeholder="傷害">
+              <!-- 2. 標籤 + 鬥氣（多選 Tag + 數字 Drive） -->
+              <div class="bg-zinc-900/90 border border-zinc-700 rounded-lg p-4 space-y-3">
+                <div class="flex justify-between items-center">
+                  <span class="text-xs text-zinc-400 font-semibold">標籤</span>
+                  <span class="text-[10px] text-zinc-500">輕/中/重 擇一 · 其他可多選</span>
+                </div>
+
+                <!-- Combo 起始：三選一 -->
+                <div class="flex flex-wrap gap-2 mb-2">
+                  <button data-tag-primary="light"  class="tag-primary px-2.5 py-1 text-xs rounded-full border border-zinc-600 text-zinc-200 bg-zinc-800 hover:border-purple-400">輕起始</button>
+                  <button data-tag-primary="medium" class="tag-primary px-2.5 py-1 text-xs rounded-full border border-zinc-600 text-zinc-200 bg-zinc-800 hover:border-purple-400">中起始</button>
+                  <button data-tag-primary="heavy"  class="tag-primary px-2.5 py-1 text-xs rounded-full border border-zinc-600 text-zinc-200 bg-zinc-800 hover:border-purple-400">重起始</button>
+                </div>
+
+                <!-- 其他多選標籤 -->
+                <div class="flex flex-wrap gap-2">
+                  <button data-tag-extra="corner" class="tag-extra px-2.5 py-1 text-xs rounded-full border border-zinc-700 text-amber-200 bg-amber-900/30 hover:border-amber-400">版邊限定</button>
+                  <button data-tag-extra="punish" class="tag-extra px-2.5 py-1 text-xs rounded-full border border-zinc-700 text-red-200 bg-red-900/30 hover:border-red-400">確反</button>
+                  <button data-tag-extra="kill"   class="tag-extra px-2.5 py-1 text-xs rounded-full border border-zinc-700 text-emerald-200 bg-emerald-900/30 hover:border-emerald-400">斬殺</button>
+                </div>
+
+                <!-- 鬥氣數量 -->
+                <div class="mt-3 flex items-center justify-between">
+                  <span class="text-xs text-zinc-400 font-semibold">鬥氣消耗</span>
+                  <div class="flex items-center gap-2">
+                    <input type="number" id="driveInput" min="0" max="6"
+                      class="bg-zinc-800 text-white w-16 text-xs p-1.5 border border-zinc-600 rounded outline-none text-center"
+                      placeholder="0~6">
+                    <span class="text-[10px] text-zinc-500">未填視為 0</span>
+                  </div>
+                </div>
               </div>
 
               <div class="flex gap-3 pt-1">
@@ -268,7 +297,6 @@
 
         <div id="librarySection">
             <div id="cardList" class="space-y-4 pb-20">
-                <!-- 空狀態由 JS 塞 -->
             </div>
         </div>
     </div>
@@ -303,13 +331,16 @@
           measurementId: "G-39RZ6VTXZ7"
         };
 
-        const app = initializeApp(firebaseConfig);  // 初始化 Firebase [web:131]
+        const app = initializeApp(firebaseConfig);  // 初始化 Firebase [web:279]
         const db = getFirestore(app);               // 取得 Firestore 實例 [web:243]
 
         let currentCharacter = ""; 
         let allNotes = [];
         let currentSteps = [];
         let currentOkiOptions = [];
+        let primaryTag = null;      // 'light' | 'medium' | 'heavy' | null
+        let extraTags = [];         // ['corner','punish','kill',...]
+
         let characters = [
             "A.K.I.", "BLANKA", "C.VIPER", "CAMMY", "CHUN-LI", 
             "DEE JAY", "DHALSIM", "E.HONDA", "ED", "ELENA", 
@@ -326,11 +357,15 @@
         const cardList     = document.getElementById('cardList');
         const okiPreview   = document.getElementById('okiPreview');
         const okiStepInput = document.getElementById('okiStepInput');
+        const driveInput   = document.getElementById('driveInput');
 
         const deleteModal      = document.getElementById('deleteModal');
         const cancelDeleteBtn  = document.getElementById('cancelDeleteBtn');
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
         let pendingDeleteId = null;
+
+        const primaryButtons = document.querySelectorAll('[data-tag-primary]');
+        const extraButtons   = document.querySelectorAll('[data-tag-extra]');
 
         function renderCharGrid(list) {
             const grid = document.getElementById('charGrid');
@@ -453,7 +488,8 @@
             const tree = document.getElementById('focusTreeContent');
             
             let driveHtml = '';
-            for(let i=0; i<6; i++) driveHtml += `<span class="drive-box ${i < note.drive ? 'drive-on' : 'drive-off'}"></span>`;
+            const driveVal = Number(note.drive) || 0;
+            for(let i=0; i<6; i++) driveHtml += `<span class="drive-box ${i < driveVal ? 'drive-on' : 'drive-off'}"></span>`;
             
             let flowHtml = note.steps.map((step, idx) => {
                 let style = "bg-zinc-700 px-3 py-1 rounded mx-1 text-3xl"; 
@@ -499,10 +535,9 @@
         window.closeFocus = function() {
             const overlay = document.getElementById('focusOverlay');
             overlay.classList.remove('show');
-            setTimeout(() => { overlay.style.display = 'none'; }, 140); // 3. 關閉動畫也縮短
+            setTimeout(() => { overlay.style.display = 'none'; }, 140);
         };
 
-        // 自訂刪除彈窗
         window.deleteCard = function(event, id) {
             event.stopPropagation();
             pendingDeleteId = id;
@@ -581,11 +616,51 @@
             }
         });
 
+        // Tag 選擇邏輯
+        primaryButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tag = btn.getAttribute('data-tag-primary');
+                if (primaryTag === tag) {
+                    primaryTag = null;
+                } else {
+                    primaryTag = tag;
+                }
+                primaryButtons.forEach(b => {
+                    const t = b.getAttribute('data-tag-primary');
+                    if (t === primaryTag) {
+                        b.classList.add('border-purple-400','bg-purple-900/40','text-purple-100');
+                    } else {
+                        b.classList.remove('border-purple-400','bg-purple-900/40','text-purple-100');
+                    }
+                });
+            });
+        });
+
+        extraButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tag = btn.getAttribute('data-tag-extra');
+                if (extraTags.includes(tag)) {
+                    extraTags = extraTags.filter(t => t !== tag);
+                } else {
+                    extraTags.push(tag);
+                }
+                if (extraTags.includes(tag)) {
+                    btn.classList.add('ring-1','ring-offset-1','ring-offset-zinc-900');
+                } else {
+                    btn.classList.remove('ring-1','ring-offset-1','ring-offset-zinc-900');
+                }
+            });
+        });
+
         saveBtn.addEventListener('click', async function() {
             if (currentSteps.length === 0) {
                 alert("請輸入連段！");
                 return;
             }
+            let driveVal = Number(driveInput.value);
+            if (isNaN(driveVal)) driveVal = 0;
+            driveVal = Math.max(0, Math.min(6, driveVal));
+
             const note = {
                 id: Date.now(),
                 char: currentCharacter,
@@ -593,8 +668,10 @@
                 okiRaw: currentOkiOptions.join('\n'),
                 frame: document.getElementById('frameInput').value || "?",
                 dmg: document.getElementById('dmgInput').value || "0",
-                type: document.getElementById('tagSelect').value,
-                drive: document.getElementById('driveSelect').value
+                type: primaryTag || "combo",           // 保留原本 type 欄位，暫時用 primaryTag 對應
+                drive: driveVal,
+                primaryTag: primaryTag,
+                extraTags: [...extraTags]
             };
 
             allNotes.push(note);
@@ -602,12 +679,17 @@
 
             currentSteps = [];
             currentOkiOptions = [];
+            primaryTag = null;
+            extraTags = [];
             stepInput.value = "";
             okiStepInput.value = "";
             document.getElementById('dmgInput').value = "";
             document.getElementById('frameInput').value = "";
+            driveInput.value = "";
             renderPreview();
             renderOkiPreview();
+            primaryButtons.forEach(b => b.classList.remove('border-purple-400','bg-purple-900/40','text-purple-100'));
+            extraButtons.forEach(b => b.classList.remove('ring-1','ring-offset-1','ring-offset-zinc-900'));
             toggleBuilder();
 
             try {
