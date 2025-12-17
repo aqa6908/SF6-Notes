@@ -25,7 +25,7 @@
         
         .step-arrow { color: #d946ef; font-weight: bold; margin: 0 6px; user-select: none; }
         
-        /* 統一比例後的輸入框樣式 */
+        /* === 優化後的輸入框與顯示框 (保留您的要求: 比例統一) === */
         .input-field {
             border-radius: 8px;
             font-family: 'Roboto Mono', monospace;
@@ -43,7 +43,6 @@
             transform: translateY(-1px);
         }
 
-        /* 統一比例後的顯示框 */
         .display-block {
             background: linear-gradient(135deg, rgba(55, 65, 81, 0.6) 0%, rgba(31, 41, 55, 0.8) 100%);
             backdrop-filter: blur(12px);
@@ -59,17 +58,16 @@
             margin: 2px 4px 2px 0;
         }
 
-        /* 區塊統一樣式 (Builder Section) */
         .builder-block {
-            background: rgba(24, 24, 27, 0.6); /* zinc-900/60 */
-            border: 1px solid #71717a; /* zinc-500 */
-            border-radius: 12px; /* xl */
+            background: rgba(24, 24, 27, 0.6);
+            border: 1px solid #71717a;
+            border-radius: 12px;
             padding: 20px;
             position: relative;
             backdrop-filter: blur(4px);
         }
 
-        /* 卡片與 X 按鈕 */
+        /* === 卡片預覽與 X 按鈕 (保留您的要求: 右上角不重疊) === */
         .card-preview {
             background: linear-gradient(135deg, #1e1e2e 0%, #2d2d3d 100%);
             border: 1px solid #404046;
@@ -85,7 +83,6 @@
             min-height: 120px;
         }
         
-        /* X 按鈕：維持在右上角並避開數據區 */
         .card-preview .delete-btn {
             position: absolute;
             top: 8px;
@@ -111,7 +108,6 @@
             transform: scale(1.1);
         }
 
-        /* 數據區 */
         .card-stats {
             background: rgba(17, 24, 39, 0.8);
             backdrop-filter: blur(10px);
@@ -127,7 +123,6 @@
             z-index: 10;
         }
 
-        /* 預覽容器統一比例 */
         .preview-container {
             background: linear-gradient(to right, rgba(39, 39, 42, 0.8), rgba(24, 24, 27, 0.8));
             border: 1px solid rgba(82, 82, 91, 0.5);
@@ -141,6 +136,7 @@
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
         }
 
+        /* === ！！！重要：完全還原您原始的 Focus Overlay CSS ！！！ === */
         #focusOverlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -163,7 +159,9 @@
             align-items: center;
             flex-direction: column; 
         }
-        @media (min-width: 768px) { .focus-container { flex-direction: row; } }
+        @media (min-width: 768px) {
+            .focus-container { flex-direction: row; }
+        }
 
         .focus-main {
             flex: 1.2;
@@ -177,6 +175,10 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            transform: translateY(6px);
+            opacity: 0;
+            will-change: transform, opacity;
+            transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.14s ease-out;
         }
 
         .focus-tree {
@@ -186,9 +188,17 @@
             justify-content: center;
             gap: 16px;
             width: 100%;
+            transform: translateY(6px);
+            opacity: 0;
+            will-change: transform, opacity;
+            transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1) 0.02s, opacity 0.16s ease-out 0.02s;
         }
 
-        /* 還原舊版樹狀圖樣式 */
+        #focusOverlay.show { opacity: 1; }
+        #focusOverlay.show .focus-main { transform: translateY(0); opacity: 1; }
+        #focusOverlay.show .focus-tree { transform: translateY(0); opacity: 1; }
+        /* === ！！！還原結束！！！ === */
+
         .tactic-btn {
             background-color: #27272a;
             padding: 16px;
@@ -199,6 +209,12 @@
             align-items: center;
             font-size: 1.05rem;
             box-shadow: 0 3px 5px rgba(0,0,0,0.3);
+        }
+        .tactic-btn:hover {
+            border-color: #444;
+            background-color: #27272a;
+            transform: none;
+            color: #e4e4e7;
         }
         .tactic-arrow { color: #22c55e; margin-right: 16px; font-weight: bold; font-size: 1.3rem; }
 
@@ -220,7 +236,6 @@
             background-color: #020617;
         }
 
-        /* 標籤置中對齊 */
         .card-tag-primary, .card-tag-extra {
             display: inline-flex;
             align-items: center;
@@ -420,7 +435,7 @@
         const extraButtons   = document.querySelectorAll('[data-tag-extra]');
         let pendingDeleteId = null;
 
-        // 千分位格式化 Helper
+        // 千分位格式化
         const formatNumber = (num) => {
             return Number(num).toLocaleString('en-US');
         };
@@ -630,7 +645,7 @@
                 steps: [...currentSteps],
                 okiRaw: currentOkiOptions.join('\n'),
                 frame: document.getElementById('frameInput').value || "0",
-                dmg: dmgValue, // 儲存原始數值 (Number or String is fine, usually string from input)
+                dmg: dmgValue,
                 drive: computeDriveCost(currentSteps),
                 primaryTag: primaryTag,
                 extraTags: [...extraTags]
@@ -665,8 +680,8 @@
 
         cancelDeleteBtn.addEventListener('click', () => deleteModal.classList.add('hidden'));
 
-        // 還原舊版 Focus 樹狀圖結構與樣式
-        window.openFocus = (id) => {
+        /* === ！！！重要：完全還原您原始的 Focus Overlay JS 邏輯 ！！！ === */
+        window.openFocus = function(id) {
             const note = allNotes.find(n => n.id === id);
             if (!note) return;
 
@@ -718,7 +733,7 @@
             setTimeout(() => { overlay.classList.add('show'); }, 10);
         };
 
-        window.closeFocus = () => {
+        window.closeFocus = function() {
             const overlay = document.getElementById('focusOverlay');
             overlay.classList.remove('show');
             setTimeout(() => { overlay.style.display = 'none'; }, 140);
@@ -732,6 +747,7 @@
                 }
             }
         });
+        /* === ！！！還原結束！！！ === */
 
         renderCharGrid(characters);
     </script>
