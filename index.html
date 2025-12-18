@@ -10,7 +10,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Teko:wght@500;600&display=swap');
         
         body { 
-            /* 保持黑體設定 */
             font-family: 'Microsoft JhengHei', 'Microsoft YaHei', sans-serif; 
             background-color: #050509; 
             color: #d4d4d8; 
@@ -219,6 +218,10 @@
                         <button onclick="toggleFilterTag(this, 'corner')" class="px-2 py-1.5 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:border-amber-700 hover:text-amber-500 transition-all text-center">版邊限定</button>
                         <button onclick="toggleFilterTag(this, 'punish')" class="px-2 py-1.5 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:border-red-700 hover:text-red-500 transition-all text-center">確反</button>
                         <button onclick="toggleFilterTag(this, 'kill')" class="px-2 py-1.5 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:border-emerald-700 hover:text-emerald-500 transition-all text-center">斬殺</button>
+                        <button onclick="toggleFilterTag(this, 'switch')" class="px-2 py-1.5 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:border-sky-700 hover:text-sky-500 transition-all text-center">換邊</button>
+                        <button onclick="toggleFilterTag(this, 'burnout')" class="px-2 py-1.5 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:border-pink-700 hover:text-pink-500 transition-all text-center">防崩</button>
+                        <button onclick="toggleFilterTag(this, 'stun')" class="px-2 py-1.5 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:border-yellow-700 hover:text-yellow-500 transition-all text-center">暈眩</button>
+                        <button onclick="toggleFilterTag(this, 'trade')" class="px-2 py-1.5 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:border-violet-700 hover:text-violet-500 transition-all text-center">相殺</button>
                         <button onclick="toggleFilterTag(this, 'SA1')" class="px-2 py-1.5 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:border-blue-700 hover:text-blue-400 transition-all text-center">SA1</button>
                         <button onclick="toggleFilterTag(this, 'SA2')" class="px-2 py-1.5 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:border-blue-700 hover:text-blue-400 transition-all text-center">SA2</button>
                         <button onclick="toggleFilterTag(this, 'SA3')" class="px-2 py-1.5 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:border-blue-700 hover:text-blue-400 transition-all text-center">SA3</button>
@@ -276,20 +279,26 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-3 gap-3 items-end">
-                    <div class="text-left">
-                        <label class="text-sm text-rose-200 font-semibold tracking-wide block mb-1 whitespace-nowrap">傷害</label>
-                        <input type="number" id="dmgInput" class="input-field text-rose-100" placeholder="2500">
+                <div class="flex gap-4 items-end">
+                    
+                    <div class="flex-1">
+                        <label class="text-sm text-rose-200 font-semibold tracking-wide block mb-1 whitespace-nowrap text-left">傷害</label>
+                        <input type="number" id="dmgInput" class="input-field text-rose-100" placeholder="0">
                     </div>
-                    <div class="text-left">
-                        <label class="text-sm text-blue-300 font-semibold tracking-wide block mb-1 whitespace-nowrap">有利幀</label>
+
+                    <div class="flex-1">
+                        <label class="text-sm text-blue-300 font-semibold tracking-wide block mb-1 whitespace-nowrap text-left">有利幀</label>
                         <input type="text" id="frameInput" class="input-field text-center text-blue-100 font-bold bg-blue-900/20 border-blue-800 focus:border-blue-500" placeholder="+0">
                     </div>
-                    <div class="text-right flex flex-col items-end">
-                         <label class="text-sm text-emerald-200 font-semibold tracking-wide block mb-1 whitespace-nowrap">鬥氣消耗</label>
-                        <span id="driveDisplay" class="input-field flex items-center justify-center text-emerald-300 font-bold bg-emerald-900/20 border-emerald-800 w-full">0</span>
+
+                    <div class="flex-none">
+                        <div class="w-[4.5rem]">
+                            <label class="text-sm text-emerald-200 font-semibold tracking-wide block mb-1 whitespace-nowrap text-center">鬥氣消耗</label>
+                            <span id="driveDisplay" class="input-field flex items-center justify-center text-emerald-300 font-bold bg-emerald-900/20 border-emerald-800 w-full px-0">0</span>
+                        </div>
                     </div>
                 </div>
+
               </div>
 
               <div class="builder-block">
@@ -315,6 +324,10 @@
                     <button data-tag-extra="corner" class="tag-extra px-3 py-1.5 text-xs rounded-full border border-zinc-700 text-amber-200 bg-amber-900/30 transition-all">版邊限定</button>
                     <button data-tag-extra="punish" class="tag-extra px-3 py-1.5 text-xs rounded-full border border-zinc-700 text-red-200 bg-red-900/30 transition-all">確反</button>
                     <button data-tag-extra="kill"    class="tag-extra px-3 py-1.5 text-xs rounded-full border border-zinc-700 text-emerald-200 bg-emerald-900/30 transition-all">斬殺</button>
+                    <button data-tag-extra="switch"  class="tag-extra px-3 py-1.5 text-xs rounded-full border border-zinc-700 text-sky-200 bg-sky-900/30 transition-all">換邊</button>
+                    <button data-tag-extra="burnout" class="tag-extra px-3 py-1.5 text-xs rounded-full border border-zinc-700 text-pink-200 bg-pink-900/30 transition-all">防崩</button>
+                    <button data-tag-extra="stun"    class="tag-extra px-3 py-1.5 text-xs rounded-full border border-zinc-700 text-yellow-200 bg-yellow-900/30 transition-all">暈眩</button>
+                    <button data-tag-extra="trade"   class="tag-extra px-3 py-1.5 text-xs rounded-full border border-zinc-700 text-violet-200 bg-violet-900/30 transition-all">相殺</button>
                 </div>
               </div>
 
@@ -516,6 +529,10 @@
             if (tag === 'corner') return '版邊限定';
             if (tag === 'punish') return '確反';
             if (tag === 'kill') return '斬殺';
+            if (tag === 'switch') return '換邊';
+            if (tag === 'burnout') return '防崩';
+            if (tag === 'stun') return '暈眩';
+            if (tag === 'trade') return '相殺';
             return tag;
         }
 
