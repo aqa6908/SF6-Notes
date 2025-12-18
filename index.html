@@ -347,13 +347,16 @@
             }
         };
 
-        // 新增：全域 ESC 監聽
-        window.addEventListener('keydown', (e) => {
+        // 強化的 ESC 監聽邏輯
+        document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                const builderSection = document.getElementById('builderSection');
-                // 如果建置框是開啟的 (沒有 hidden)，就執行返回
-                if (!builderSection.classList.contains('hidden')) {
-                    window.history.back();
+                const builder = document.getElementById('builderSection');
+                if (builder && !builder.classList.contains('hidden')) {
+                    e.preventDefault(); // 防止預設行為
+                    if (document.activeElement instanceof HTMLElement) {
+                        document.activeElement.blur(); // 強制失焦
+                    }
+                    window.history.back(); // 觸發返回
                 }
             }
         });
