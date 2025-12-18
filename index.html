@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SF6 TACTICS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -14,6 +14,7 @@
             background-color: #050509; 
             color: #d4d4d8; 
             overflow-y: scroll;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .mono-font { font-family: 'Roboto Mono', monospace; }
@@ -23,12 +24,14 @@
         ::-webkit-scrollbar-track { background: #1a1a1a; }
         ::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
         
+        /* Input group style */
         .input-field {
-            border-radius: 8px;
+            border-radius: 8px 0 0 8px;
             font-family: 'Roboto Mono', monospace;
             font-size: 1rem;
             padding: 10px 14px;
             border: 2px solid #4b5563;
+            border-right: none;
             transition: all 0.2s ease;
             background: linear-gradient(145deg, #0f0f23, #15152b);
             color: #f3f4f6;
@@ -37,7 +40,29 @@
         .input-field:focus {
             border-color: #a855f7;
             outline: none;
-            transform: translateY(-1px);
+        }
+
+        .add-btn-input {
+            background-color: #4b5563;
+            border: 2px solid #4b5563;
+            border-radius: 0 8px 8px 0;
+            color: white;
+            padding: 0 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+        .add-btn-input:active { background-color: #6b7280; }
+        .input-group:focus-within .add-btn-input {
+            background-color: #7e22ce;
+            border-color: #a855f7;
+        }
+        .input-group:focus-within .add-btn-input:active {
+            background-color: #6b21a8;
         }
 
         .builder-block {
@@ -57,7 +82,7 @@
             min-height: 70px;
             display: flex;
             flex-wrap: wrap;
-            align-items: center;
+            align-items: center; /* 確保內容垂直置中 */
             gap: 12px; 
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
         }
@@ -92,12 +117,30 @@
         }
         
         .char-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px; }
+        
+        /* 修正：改用 Flexbox 強制垂直與水平置中 */
         .char-btn {
-            background-color: #27272a; border: 1px solid #3f3f46; color: #a1a1aa;
-            padding: 24px 0; text-align: center; cursor:pointer; border-radius:4px;
+            background-color: #27272a; 
+            border: 1px solid #3f3f46; 
+            color: #a1a1aa;
+            min-height: 80px; /* 固定最小高度 */
+            padding: 8px;     /* 避免字太長貼邊 */
+            cursor: pointer; 
+            border-radius: 4px;
+            display: flex;    /* 關鍵：Flex 佈局 */
+            justify-content: center; /* 水平置中 */
+            align-items: center;     /* 垂直置中 */
+            transition: transform 0.1s, background-color 0.2s;
         }
         .char-btn:hover { background-color:#3f3f46;color:#fff;border-color:#d946ef;transform:scale(1.05);}
-        .char-name-display { font-family:'Teko',sans-serif;font-size:1.6rem;line-height:1;letter-spacing:1px;}
+        .char-name-display { font-family:'Teko',sans-serif;font-size:1.6rem;line-height:1;letter-spacing:1px; text-align: center;}
+
+        /* 修正：數字顯示框也強制置中 */
+        #driveDisplay, .centered-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
         .builder-shell {
             background-image: linear-gradient(to right, rgba(63,63,70,0.25) 1px, transparent 1px), linear-gradient(to bottom, rgba(63,63,70,0.25) 1px, transparent 1px);
@@ -105,7 +148,6 @@
             background-color: #020617;
         }
 
-        /* 標籤樣式 */
         .tag-pill {
             display: inline-flex;
             align-items: center;
@@ -116,10 +158,9 @@
             color: #9ca3af;
         }
         
-        /* SA 標籤樣式 (修正為淡色風格) */
         .tag-sa {
-            background-color: rgba(14, 165, 233, 0.2); /* sky-500 at 20% opacity */
-            color: #7dd3fc; /* sky-300 */
+            background-color: rgba(14, 165, 233, 0.2);
+            color: #7dd3fc;
             border: 1px solid rgba(14, 165, 233, 0.4);
         }
 
@@ -129,12 +170,12 @@
 <body class="pb-20">
 
     <div id="navBar" class="hidden fixed top-0 w-full bg-zinc-900/95 backdrop-blur border-b border-zinc-700 p-3 z-50 flex justify-between items-center shadow-lg">
-        <button onclick="goBackToSelect()" class="text-gray-400 hover:text-white flex items-center text-sm font-bold transition">
+        <button onclick="history.back()" class="text-gray-400 hover:text-white flex items-center text-sm font-bold transition">
             <span class="mr-1 text-xl">‹</span> 選角
         </button>
         <h1 class="text-3xl font-bold text-white fight-font tracking-widest text-shadow" id="navTitle">RYU</h1>
         <button onclick="openBuilder()" id="addBtn" class="bg-purple-700 hover:bg-purple-600 text-white px-4 py-1.5 rounded text-sm font-bold shadow-[0_0_10px_rgba(168,85,247,0.5)] transition">
-            + 紀錄
+            + NEW
         </button>
     </div>
 
@@ -161,12 +202,15 @@
               <div class="builder-block">
                 <div class="flex justify-between items-center mb-3">
                     <label class="text-sm text-purple-200 font-semibold tracking-wide">連段步驟</label>
-                    <span class="text-xs text-zinc-400">Enter 新增 · Backspace 刪除</span>
+                    <span class="text-xs text-zinc-400">Enter 或 +</span>
                 </div>
                 <div id="comboPreview" class="preview-container mb-3">
                     <span class="text-zinc-500 text-sm">輸入指令後顯示於此...</span>
                 </div>
-                <input type="text" id="stepInput" class="input-field" placeholder="例如: 2MP, 5HP, DRC...">
+                <div class="input-group flex w-full">
+                    <input type="text" id="stepInput" class="input-field" placeholder="例如: 2MP, 5HP, DRC...">
+                    <button id="addStepBtn" class="add-btn-input">+</button>
+                </div>
               </div>
 
               <div class="builder-block">
@@ -174,13 +218,16 @@
                     <label class="text-sm text-blue-200 font-semibold tracking-wide">壓起身選項</label>
                     <div class="flex items-center gap-3">
                         <label class="text-xs text-gray-300">有利幀</label>
-                        <input type="text" id="frameInput" class="input-field !w-20 !py-1 !px-2 text-center text-green-300" placeholder="+42">
+                        <input type="text" id="frameInput" class="input-field !w-20 !py-1 !px-2 !rounded !border-r-2 text-center text-green-300" placeholder="+42">
                     </div>
                 </div>
                 <div id="okiPreview" class="preview-container mb-3 !gap-2 !block">
-                    <span class="text-zinc-500 text-sm">點擊 Enter 增加選項...</span>
+                    <span class="text-zinc-500 text-sm">點擊 + 增加選項...</span>
                 </div>
-                <input type="text" id="okiStepInput" class="input-field" placeholder="例如: 投, Shimmy...">
+                <div class="input-group flex w-full">
+                    <input type="text" id="okiStepInput" class="input-field" placeholder="例如: 投, Shimmy...">
+                    <button id="addOkiBtn" class="add-btn-input">+</button>
+                </div>
               </div>
 
               <div class="builder-block">
@@ -189,12 +236,12 @@
                         <div class="flex items-center justify-between mb-2">
                              <label class="text-sm text-rose-200 font-semibold tracking-wide">傷害數值</label>
                         </div>
-                        <input type="number" id="dmgInput" class="input-field text-rose-100" placeholder="例如 2,500">
+                        <input type="number" id="dmgInput" class="input-field !rounded !border-r-2 text-rose-100" placeholder="例如 2,500">
                     </div>
                     <div class="text-right">
                         <label class="text-sm text-emerald-200 font-semibold tracking-wide block mb-2">鬥氣消耗</label>
                         <div class="flex items-center justify-end gap-3">
-                            <span id="driveDisplay" class="input-field text-emerald-300 w-16 text-center font-bold bg-gradient-to-r from-emerald-900/30 to-emerald-900/50 border-emerald-500/50">
+                            <span id="driveDisplay" class="input-field !rounded !border-r-2 text-emerald-300 w-16 font-bold bg-gradient-to-r from-emerald-900/30 to-emerald-900/50 border-emerald-500/50 centered-display">
                               0
                             </span>
                         </div>
@@ -224,7 +271,7 @@
                   <button id="saveBtn" class="flex-1 bg-gradient-to-r from-purple-700 to-purple-600 hover:from-purple-600 hover:to-purple-500 text-white py-3 rounded-xl text-sm shadow-xl font-bold transition-all transform hover:scale-[1.02]">
                       儲存筆記
                   </button>
-                  <button onclick="closeBuilder()" class="px-6 text-gray-300 hover:text-white text-sm py-3 rounded-xl border border-zinc-600 hover:border-zinc-400 transition-all">
+                  <button onclick="history.back()" class="px-6 text-gray-300 hover:text-white text-sm py-3 rounded-xl border border-zinc-600 hover:border-zinc-400 transition-all">
                       取消
                   </button>
               </div>
@@ -265,22 +312,38 @@
 
         const previewDiv    = document.getElementById('comboPreview');
         const stepInput     = document.getElementById('stepInput');
+        const addStepBtn    = document.getElementById('addStepBtn');
         const saveBtn       = document.getElementById('saveBtn');
         const cardList      = document.getElementById('cardList');
         const okiPreview    = document.getElementById('okiPreview');
         const okiStepInput  = document.getElementById('okiStepInput');
+        const addOkiBtn     = document.getElementById('addOkiBtn');
         const driveDisplay  = document.getElementById('driveDisplay');
         const primaryButtons = document.querySelectorAll('[data-tag-primary]');
         const extraButtons   = document.querySelectorAll('[data-tag-extra]');
 
         const formatNumber = (num) => Number(num).toLocaleString('en-US');
 
+        window.history.replaceState({ view: 'select' }, '', '');
+
+        window.onpopstate = (event) => {
+            const state = event.state;
+            if (!state || state.view === 'select') {
+                closeBuilderUI();
+                showSelectScreenUI();
+            } else if (state.view === 'content') {
+                closeBuilderUI();
+                document.getElementById('contentScreen').classList.remove('hidden');
+                document.getElementById('navBar').classList.remove('hidden');
+                document.getElementById('charSelectScreen').classList.add('hidden');
+            }
+        };
+
         function getStepClass(step) {
             const upper = step.toUpperCase();
             if (upper === 'DRC') return 'bg-green-900/40 border-green-600 text-green-100 border';
             if (upper === 'DR')  return 'bg-green-900/30 border-green-700 text-green-200 border'; 
             if (upper.includes('SA') || upper.includes('CA')) return 'bg-blue-900/40 border-blue-600 text-blue-100 border';
-            // 修正：加入 PP 與 KK 的判定
             if (upper.includes('OD') || upper.includes('EX') || upper.includes('PP') || upper.includes('KK')) return 'bg-yellow-900/30 border-yellow-600 text-yellow-100 border';
             return 'bg-gray-700/50 border-gray-600 text-gray-200 border';
         }
@@ -333,7 +396,7 @@
 
         function renderOkiPreview() {
             if (currentOkiOptions.length === 0) {
-                okiPreview.innerHTML = '<span class="text-zinc-500 text-sm">點擊 Enter 增加選項...</span>';
+                okiPreview.innerHTML = '<span class="text-zinc-500 text-sm">點擊 + 增加選項...</span>';
                 return;
             }
             okiPreview.innerHTML = currentOkiOptions.map(opt => 
@@ -484,12 +547,29 @@
 
         window.selectCharacter = async (name) => {
             currentCharacter = name;
+            window.history.pushState({ view: 'content', char: name }, '', '');
+            
+            showContentScreenUI(name);
+            await loadNotesFromCloud();
+        };
+
+        function showContentScreenUI(name) {
             document.getElementById('charSelectScreen').classList.add('hidden');
             document.getElementById('contentScreen').classList.remove('hidden');
             document.getElementById('navBar').classList.remove('hidden');
             document.getElementById('navTitle').innerText = name;
-            await loadNotesFromCloud();
-        };
+        }
+
+        function showSelectScreenUI() {
+            document.getElementById('contentScreen').classList.add('hidden');
+            document.getElementById('navBar').classList.add('hidden');
+            document.getElementById('charSelectScreen').classList.remove('hidden');
+        }
+
+        function closeBuilderUI() {
+            document.getElementById('builderSection').classList.add('hidden');
+            document.getElementById('addBtn').classList.remove('hidden');
+        }
 
         async function loadNotesFromCloud() {
             allNotes = [];
@@ -500,22 +580,29 @@
         }
 
         window.openBuilder = () => {
+            window.history.pushState({ view: 'builder' }, '', '');
             document.getElementById('builderSection').classList.remove('hidden');
             document.getElementById('addBtn').classList.add('hidden');
             stepInput.focus();
         };
 
         window.closeBuilder = () => {
-            document.getElementById('builderSection').classList.add('hidden');
-            document.getElementById('addBtn').classList.remove('hidden');
+            window.history.back();
         };
 
-        window.goBackToSelect = () => {
-            document.getElementById('contentScreen').classList.add('hidden');
-            document.getElementById('navBar').classList.add('hidden');
-            document.getElementById('charSelectScreen').classList.remove('hidden');
-            closeBuilder();
-        };
+        addStepBtn.addEventListener('click', () => {
+            if (stepInput.value.trim()) {
+                currentSteps.push(stepInput.value.trim().toUpperCase());
+                stepInput.value = ""; renderPreview();
+            }
+        });
+        
+        addOkiBtn.addEventListener('click', () => {
+            if (okiStepInput.value.trim()) {
+                currentOkiOptions.push(okiStepInput.value.trim());
+                okiStepInput.value = ""; renderOkiPreview();
+            }
+        });
 
         stepInput.addEventListener('input', function() { this.value = this.value.toUpperCase(); });
         stepInput.addEventListener('keydown', (e) => {
@@ -590,12 +677,13 @@
 
             await addDoc(collection(db, "notes"), note);
             
+            window.history.back();
+            
             currentSteps = []; currentOkiOptions = []; primaryTag = null; extraTags = [];
             renderPreview(); renderOkiPreview();
             dmgInputEl.value = ""; document.getElementById('frameInput').value = "";
             primaryButtons.forEach(b => b.classList.remove('border-purple-400','bg-purple-900/50','text-purple-100','ring-2','ring-purple-400/50'));
             extraButtons.forEach(b => b.classList.remove('ring-2','ring-offset-1','ring-offset-zinc-900','bg-opacity-60'));
-            closeBuilder();
             loadNotesFromCloud();
         });
 
