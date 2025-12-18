@@ -207,6 +207,7 @@
                         <button onclick="toggleFilterTag(this, 'light')" class="px-2 py-1.5 text-xs rounded-md border border-zinc-600 text-zinc-400 hover:bg-zinc-800 transition-all text-center">輕起始</button>
                         <button onclick="toggleFilterTag(this, 'medium')" class="px-2 py-1.5 text-xs rounded-md border border-zinc-600 text-zinc-400 hover:bg-zinc-800 transition-all text-center">中起始</button>
                         <button onclick="toggleFilterTag(this, 'heavy')" class="px-2 py-1.5 text-xs rounded-md border border-zinc-600 text-zinc-400 hover:bg-zinc-800 transition-all text-center">重起始</button>
+                        <button onclick="toggleFilterTag(this, 'di')" class="px-2 py-1.5 text-xs rounded-md border border-zinc-600 text-zinc-400 hover:bg-zinc-800 transition-all text-center">DI起始</button>
                         <button onclick="toggleFilterTag(this, 'od')" class="px-2 py-1.5 text-xs rounded-md border border-zinc-600 text-zinc-400 hover:bg-zinc-800 transition-all text-center">OD起始</button>
                         <button onclick="toggleFilterTag(this, 'dr')" class="px-2 py-1.5 text-xs rounded-md border border-zinc-600 text-zinc-400 hover:bg-zinc-800 transition-all text-center">綠衝起始</button>
                         <button onclick="toggleFilterTag(this, 'sa')" class="px-2 py-1.5 text-xs rounded-md border border-zinc-600 text-zinc-400 hover:bg-zinc-800 transition-all text-center">SA起始</button>
@@ -508,6 +509,7 @@
 
         function getStepClass(step) {
             const upper = step.toUpperCase();
+            if (upper === 'DI')  return 'bg-red-900/40 border-red-500 text-red-100 border';
             if (upper === 'DRC') return 'bg-green-900/40 border-green-600 text-green-100 border';
             if (upper === 'DR')  return 'bg-green-900/30 border-green-700 text-green-200 border'; 
             if (upper.includes('SA') || upper.includes('CA')) return 'bg-blue-900/40 border-blue-600 text-blue-100 border';
@@ -516,6 +518,7 @@
         }
 
         function primaryTagLabel(tag) {
+            if (tag === 'di') return 'DI起始';
             if (tag === 'light') return '輕起始';
             if (tag === 'medium') return '中起始';
             if (tag === 'heavy') return '重起始';
@@ -929,6 +932,7 @@
             if (!firstStep) return null;
             const s = firstStep.toUpperCase();
             
+            if (s === 'DI') return 'di';
             if (s.includes('PP') || s.includes('KK') || s.includes('OD')) return 'od';
             if (s.startsWith('SA') || s.startsWith('CA')) return 'sa';
             if (s === 'DR') return 'dr';
