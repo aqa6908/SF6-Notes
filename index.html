@@ -10,7 +10,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Teko:wght@500;600&display=swap');
         
         body { 
-            /* 修正：移除標楷體，改回無襯線黑體 */
+            /* 保持黑體設定 */
             font-family: 'Microsoft JhengHei', 'Microsoft YaHei', sans-serif; 
             background-color: #050509; 
             color: #d4d4d8; 
@@ -276,18 +276,18 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-12 gap-4 items-end">
-                    <div class="col-span-5">
-                        <label class="text-sm text-rose-200 font-semibold tracking-wide block mb-2">傷害 (Dmg)</label>
+                <div class="grid grid-cols-3 gap-3 items-end">
+                    <div class="text-left">
+                        <label class="text-sm text-rose-200 font-semibold tracking-wide block mb-1 whitespace-nowrap">傷害</label>
                         <input type="number" id="dmgInput" class="input-field text-rose-100" placeholder="2500">
                     </div>
-                    <div class="col-span-4">
-                        <label class="text-sm text-blue-300 font-semibold tracking-wide block mb-2">有利幀 (Frame)</label>
+                    <div class="text-left">
+                        <label class="text-sm text-blue-300 font-semibold tracking-wide block mb-1 whitespace-nowrap">有利幀</label>
                         <input type="text" id="frameInput" class="input-field text-center text-blue-100 font-bold bg-blue-900/20 border-blue-800 focus:border-blue-500" placeholder="+0">
                     </div>
-                    <div class="col-span-3 text-right">
-                         <label class="text-sm text-emerald-200 font-semibold tracking-wide block mb-2">氣條</label>
-                        <span id="driveDisplay" class="input-field justify-center text-emerald-300 font-bold bg-emerald-900/20 border-emerald-800">0</span>
+                    <div class="text-right flex flex-col items-end">
+                         <label class="text-sm text-emerald-200 font-semibold tracking-wide block mb-1 whitespace-nowrap">鬥氣消耗</label>
+                        <span id="driveDisplay" class="input-field flex items-center justify-center text-emerald-300 font-bold bg-emerald-900/20 border-emerald-800 w-full">0</span>
                     </div>
                 </div>
               </div>
@@ -551,7 +551,7 @@
             driveDisplay.textContent = computeDriveCost(currentSteps);
         }
 
-        // --- NEW OKI LIST LOGIC ---
+        // --- OKI LIST LOGIC ---
         
         window.addOkiRow = () => {
             currentOkiOptions.push("");
@@ -570,12 +570,6 @@
         // Render the list of inputs
         function renderDynamicOkiList(focusLast = false) {
             okiListContainer.innerHTML = "";
-            if (currentOkiOptions.length === 0) {
-                 // Option to show empty state or just leave blank. 
-                 // Let's ensure at least one row if user wants? Or just blank.
-                 // We will leave blank but user can click "+ New".
-            }
-
             currentOkiOptions.forEach((opt, idx) => {
                 const row = document.createElement('div');
                 row.className = 'oki-input-row';
