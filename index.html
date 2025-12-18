@@ -78,7 +78,6 @@
             backdrop-filter: blur(4px);
         }
 
-        /* 修正：強制絕對置中 (Flex + Text Center + Width Full) */
         .preview-container {
             background: linear-gradient(to right, rgba(39, 39, 42, 0.8), rgba(24, 24, 27, 0.8));
             border: 1px solid rgba(82, 82, 91, 0.5);
@@ -97,8 +96,8 @@
         .preview-placeholder {
             width: 100%;
             text-align: center;
-            color: #71717a; /* zinc-500 */
-            font-size: 0.875rem; /* text-sm */
+            color: #71717a;
+            font-size: 0.875rem;
         }
 
         .strategy-card {
@@ -314,7 +313,6 @@
         let currentOkiOptions = [];
         let extraTags = [];
         
-        // 用來追蹤現在是在「新增」還是「修改」
         let editingNoteId = null; 
         let editingDocId = null;
 
@@ -348,6 +346,17 @@
                 document.getElementById('charSelectScreen').classList.add('hidden');
             }
         };
+
+        // 新增：全域 ESC 監聽
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const builderSection = document.getElementById('builderSection');
+                // 如果建置框是開啟的 (沒有 hidden)，就執行返回
+                if (!builderSection.classList.contains('hidden')) {
+                    window.history.back();
+                }
+            }
+        });
 
         function getStepClass(step) {
             const upper = step.toUpperCase();
@@ -601,17 +610,14 @@
             renderNotes();
         }
 
-        // 修改功能的核心邏輯
         window.startEdit = (noteId) => {
             const note = allNotes.find(n => n.id === noteId);
             if (!note) return;
 
-            // 1. 設定編輯狀態
             editingNoteId = note.id;
             editingDocId = note.docId;
-            builderTitle.innerText = "Edit Combo"; // 改變標題
+            builderTitle.innerText = "Edit Combo";
 
-            // 2. 倒資料回去
             currentSteps = [...note.steps];
             currentOkiOptions = note.okiRaw ? note.okiRaw.split('\n') : [];
             extraTags = note.extraTags || [];
@@ -619,7 +625,6 @@
             document.getElementById('dmgInput').value = note.dmg;
             document.getElementById('frameInput').value = note.frame;
 
-            // 3. 還原 UI 狀態
             renderPreview();
             renderOkiPreview();
             
@@ -632,12 +637,10 @@
                 }
             });
 
-            // 4. 打開 Builder
             openBuilder();
         };
 
         window.openBuilder = () => {
-            // 如果不是編輯模式，就重置表單
             if (!editingNoteId) {
                 resetBuilderForm();
                 builderTitle.innerText = "New Combo";
@@ -652,12 +655,10 @@
             window.history.back();
         };
 
-        // 當離開 Builder (popstate) 時觸發的重置
-        const originalCloseBuilderUI = closeBuilderUI; // 備份原函式
+        const originalCloseBuilderUI = closeBuilderUI;
         closeBuilderUI = () => {
             document.getElementById('builderSection').classList.add('hidden');
             document.getElementById('addBtn').classList.remove('hidden');
-            // 離開時，一定要重置編輯狀態，不然下次按 + NEW 會變成修改上一筆
             editingNoteId = null; 
             editingDocId = null;
             resetBuilderForm();
@@ -674,7 +675,6 @@
             extraButtons.forEach(b => b.classList.remove('ring-2','ring-offset-1','ring-offset-zinc-900','bg-opacity-60'));
         }
 
-        // 自動判斷起始標籤
         function determineStarterTag(firstStep) {
             if (!firstStep) return null;
             const s = firstStep.toUpperCase();
@@ -685,7 +685,7 @@
             if (s.includes('H')) return 'heavy';
             if (s.includes('M')) return 'medium';
             if (s.includes('L')) return 'light';
-            return null; // 預設無
+            return null;
         }
 
         addStepBtn.addEventListener('click', () => {
@@ -742,7 +742,6 @@
             const dmgValue = dmgInputEl.value.trim();
             if (!currentSteps.length || !dmgValue) return alert("連段與傷害為必填");
 
-            // 儲存時自動判斷起始標籤 (取第一招)
             const autoPrimaryTag = determineStarterTag(currentSteps[0]);
 
             const noteData = {
@@ -752,20 +751,18 @@
                 frame: document.getElementById('frameInput').value || "0",
                 dmg: dmgValue,
                 drive: computeDriveCost(currentSteps),
-                primaryTag: autoPrimaryTag, // 自動填入
+                primaryTag: autoPrimaryTag, 
                 extraTags: [...extraTags]
             };
 
             if (editingNoteId && editingDocId) {
-                // 修改模式：更新現有文件，ID 不變
                 await updateDoc(doc(db, "notes", editingDocId), noteData);
             } else {
-                // 新增模式：建立新 ID
                 noteData.id = Date.now();
                 await addDoc(collection(db, "notes"), noteData);
             }
             
-            window.history.back(); // 關閉 Builder
+            window.history.back(); 
             loadNotesFromCloud();
         });
 
