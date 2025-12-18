@@ -2,863 +2,194 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SF6 TACTICS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combo Sort</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Teko:wght@500;600&display=swap');
-        
-        body { 
-            font-family: 'Microsoft JhengHei', 'Microsoft YaHei', sans-serif; 
-            background-color: #050509; 
-            color: #d4d4d8; 
-            overflow-y: scroll;
-            -webkit-tap-highlight-color: transparent;
+        :root {
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-main: #ffffff;
+            --accent: #4caf50; /* 改個綠色系，代表確認/執行 */
         }
-        
-        .mono-font { font-family: 'Roboto Mono', monospace; }
-        .fight-font { font-family: 'Teko', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #1a1a1a; }
-        ::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
-        
-        .input-field {
+        body {
+            /* 不用標楷體，改回乾淨的無襯線字體 */
+            font-family: 'Microsoft JhengHei', 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* --- 控制列 --- */
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            background: #333;
+            padding: 10px 20px;
             border-radius: 8px;
-            font-family: 'Roboto Mono', monospace;
-            font-size: 1rem;
-            padding: 10px 14px;
-            border: 2px solid #4b5563;
-            transition: all 0.2s ease;
-            background: linear-gradient(145deg, #0f0f23, #15152b);
-            color: #f3f4f6;
+            align-items: center;
+        }
+
+        select {
+            padding: 8px;
+            border-radius: 4px;
+            background: #444;
+            color: white;
+            border: 1px solid #555;
+            cursor: pointer;
+        }
+
+        .sort-btn {
+            background-color: var(--accent);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sort-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        /* --- 卡片區 --- */
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
             width: 100%;
-        }
-        .input-field:focus { border-color: #a855f7; outline: none; }
-        .input-group .input-field { border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: none; }
-
-        .add-btn-input {
-            background-color: #4b5563; border: 2px solid #4b5563; border-radius: 0 8px 8px 0; color: white;
-            padding: 0 16px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; line-height: 1;
-        }
-        .add-btn-input:active { background-color: #6b7280; }
-        .input-group:focus-within .add-btn-input { background-color: #7e22ce; border-color: #a855f7; }
-        .input-group:focus-within .add-btn-input:active { background-color: #6b21a8; }
-
-        .builder-block {
-            background: rgba(24, 24, 27, 0.6); border: 1px solid #71717a; border-radius: 12px;
-            padding: 20px; position: relative; backdrop-filter: blur(4px);
+            max-width: 1000px;
         }
 
-        .preview-container {
-            background: linear-gradient(to right, rgba(39, 39, 42, 0.8), rgba(24, 24, 27, 0.8));
-            border: 1px solid rgba(82, 82, 91, 0.5); border-radius: 12px; padding: 16px; min-height: 70px;
-            display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; 
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); text-align: center;
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            width: 300px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            border-left: 5px solid var(--accent); /* 左側裝飾線 */
         }
-        .preview-placeholder { width: 100%; text-align: center; color: #71717a; font-size: 0.875rem; }
 
-        .strategy-card {
-            background-color: #121214; border: 1px solid #27272a; border-radius: 0.75rem;
-            overflow: hidden; transition: all 0.3s ease; cursor: pointer; user-select: none;
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 8px;
         }
-        .strategy-card:hover { border-color: #52525b; }
-        .strategy-card.expanded { box-shadow: 0 10px 25px -5px rgba(88, 28, 135, 0.3); border-color: rgba(168, 85, 247, 0.4); }
 
-        .move-badge {
-            padding: 0.5rem 0.75rem; border-radius: 0.25rem; font-weight: 700; font-family: 'Roboto Mono', monospace;
-            font-size: 1.125rem; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.2); backdrop-filter: blur(4px); border-width: 1px;
+        .combo-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .stats {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+            color: #ccc;
         }
         
-        .char-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px; }
-        .char-btn {
-            background-color: #27272a; border: 1px solid #3f3f46; color: #a1a1aa; min-height: 80px; padding: 8px;
-            cursor: pointer; border-radius: 4px; display: flex; justify-content: center; align-items: center;
-            transition: transform 0.1s, background-color 0.2s;
-        }
-        .char-btn:hover { background-color:#3f3f46;color:#fff;border-color:#d946ef;transform:scale(1.05);}
-        .char-name-display { font-family:'Teko',sans-serif;font-size:1.6rem;line-height:1;letter-spacing:1px; text-align: center;}
-
-        #driveDisplay, .centered-display { display: flex; align-items: center; justify-content: center; }
-        .builder-shell {
-            background-image: linear-gradient(to right, rgba(63,63,70,0.25) 1px, transparent 1px), linear-gradient(to bottom, rgba(63,63,70,0.25) 1px, transparent 1px);
-            background-size: 24px 24px; background-color: #020617;
+        .stat-val {
+            color: #fff;
+            font-weight: bold;
         }
 
-        .tag-pill { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-size: 0.75rem; border: 1px solid #52525b; color: #9ca3af; }
-        .tag-sa { background-color: rgba(14, 165, 233, 0.2); color: #7dd3fc; border: 1px solid rgba(14, 165, 233, 0.4); }
-        .drive-skew { transform: skewX(-12deg); }
-
-        /* Filter Styles */
-        .filter-zero-btn {
-            padding: 4px 12px; border: 1px solid #3f3f46; border-radius: 6px; color: #71717a; 
-            cursor: pointer; font-size: 0.85rem; transition: all 0.2s; background-color: #18181b;
-            display: flex; align-items: center; justify-content: center; font-weight: bold;
-        }
-        .filter-zero-btn.active {
-            background-color: rgba(34, 197, 94, 0.1); color: #4ade80; border-color: #22c55e;
-            box-shadow: 0 0 10px rgba(34, 197, 94, 0.2);
-        }
-
-        .drive-bar-lg {
-            width: 28px; height: 32px; /* 變大 */
-            transform: skewX(-12deg); 
-            border: 1px solid #3f3f46;
-            background-color: #27272a; 
-            cursor: pointer; 
-            border-radius: 4px;
-            transition: all 0.15s ease;
-        }
-        .drive-bar-lg.active {
-            background-color: #22c55e; 
-            border-color: #4ade80;
-            box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);
-        }
     </style>
 </head>
-<body class="pb-20">
+<body>
 
-    <div id="navBar" class="hidden fixed top-0 w-full bg-zinc-900/95 backdrop-blur border-b border-zinc-700 p-3 z-50 flex justify-between items-center shadow-lg">
-        <button onclick="history.back()" class="text-gray-400 hover:text-white flex items-center text-sm font-bold transition">
-            <span class="mr-1 text-xl">‹</span> 選角
-        </button>
-        <h1 class="absolute left-1/2 -translate-x-1/2 text-3xl font-bold text-white fight-font tracking-widest text-shadow" id="navTitle">RYU</h1>
-        <button onclick="openBuilder()" id="addBtn" class="bg-purple-700 hover:bg-purple-600 text-white px-4 py-1.5 rounded text-sm font-bold shadow-[0_0_10px_rgba(168,85,247,0.5)] transition">
-            + NEW
+    <div class="controls">
+        <label>排序方式：</label>
+        <select id="sort-select">
+            <option value="damage">傷害 (Damage)</option>
+            <option value="cost">氣條消耗 (Cost)</option>
+        </select>
+
+        <button id="sort-direction-btn" class="sort-btn">
+            <span id="sort-icon">⬇</span> 
+            <span id="sort-text">高 → 低</span>
         </button>
     </div>
 
-    <div id="charSelectScreen" class="container mx-auto mt-6 px-2 max-w-2xl animate-[fadeIn_0.5s_ease-out]">
-        <div class="text-center mb-6 sticky top-0 bg-[#050509] z-40 py-4 border-b border-zinc-800">
-            <h1 class="text-5xl text-white fight-font mb-2">CHARACTER SELECT</h1>
-        </div>
-        <div class="char-grid" id="charGrid"></div>
-    </div>
+    <div class="container" id="card-container"></div>
 
-    <div id="contentScreen" class="hidden container mx-auto mt-20 px-4 max-w-md">
-        
-        <button onclick="toggleFilter()" class="w-full bg-zinc-800/80 border border-zinc-700 rounded-lg p-3 mb-4 flex items-center justify-center gap-2 text-gray-400 hover:text-white hover:border-purple-500 hover:bg-zinc-800 transition-all shadow-lg group">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:text-purple-400 transition-colors"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-            <span class="font-bold tracking-widest text-lg font-mono group-hover:text-purple-100 transition-colors">FILTER</span>
-        </button>
+    <script>
+        // 假資料：這是「已經選定角色」後的招式/連段卡片
+        const combos = [
+            { name: "輕腳確認連段", damage: 1250, cost: 0 },
+            { name: "版邊壓起身套路", damage: 2800, cost: 2 },
+            { name: "SA3 最大傷害", damage: 4500, cost: 3 },
+            { name: "中距離牽制", damage: 800, cost: 0 },
+            { name: "OD 昇龍反擊", damage: 1600, cost: 2 },
+            { name: "偷襲下段起始", damage: 2100, cost: 1 }
+        ];
 
-        <div id="filterSection" class="hidden mb-6 bg-[#18181b] border border-zinc-700 rounded-xl p-5 shadow-2xl animate-[fadeIn_0.15s_ease-out]">
-            <div class="space-y-6">
+        let currentSortKey = 'damage'; 
+        let isDescending = true; // 預設降冪 (數字大在前面，因為傷害高比較爽)
+
+        const container = document.getElementById('card-container');
+        const sortSelect = document.getElementById('sort-select');
+        const sortBtn = document.getElementById('sort-direction-btn');
+        const sortIcon = document.getElementById('sort-icon');
+        const sortText = document.getElementById('sort-text');
+
+        function render() {
+            container.innerHTML = '';
+
+            // 排序邏輯
+            const sorted = [...combos].sort((a, b) => {
+                const valA = a[currentSortKey];
+                const valB = b[currentSortKey];
                 
-                <div>
-                    <div class="flex justify-between items-end mb-3">
-                        <div class="text-xs text-zinc-500 font-bold tracking-wider">MAX DRIVE</div>
-                        <div id="driveCostLabel" class="text-sm text-green-400 font-mono font-bold">ALL</div>
-                    </div>
-                    
-                    <div class="flex items-center justify-between gap-3 px-1">
-                        <div onclick="setDriveCap(0)" class="filter-zero-btn active" id="fd-0">
-                            無消耗
-                        </div>
-                        
-                        <div class="flex gap-1">
-                            <div onclick="setDriveCap(1)" class="drive-bar-lg active" id="fd-1"></div>
-                            <div onclick="setDriveCap(2)" class="drive-bar-lg active" id="fd-2"></div>
-                            <div onclick="setDriveCap(3)" class="drive-bar-lg active" id="fd-3"></div>
-                            <div onclick="setDriveCap(4)" class="drive-bar-lg active" id="fd-4"></div>
-                            <div onclick="setDriveCap(5)" class="drive-bar-lg active" id="fd-5"></div>
-                            <div onclick="setDriveCap(6)" class="drive-bar-lg active" id="fd-6"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <hr class="border-zinc-800">
-
-                <div>
-                    <div class="text-xs text-zinc-500 mb-3 font-bold tracking-wider">STARTER</div>
-                    <div class="flex flex-wrap gap-2 justify-center" id="filterStarters">
-                        <button onclick="toggleFilterTag(this, 'light')" class="px-3 py-1.5 text-xs rounded-md border border-zinc-600 text-zinc-400 hover:bg-zinc-800 transition-all">輕起始</button>
-                        <button onclick="toggleFilterTag(this, 'medium')" class="px-3 py-1.5 text-xs rounded-md border border-zinc-600 text-zinc-400 hover:bg-zinc-800 transition-all">中起始</button>
-                        <button onclick="toggleFilterTag(this, 'heavy')" class="px-3 py-1.5 text-xs rounded-md border border-zinc-600 text-zinc-400 hover:bg-zinc-800 transition-all">重起始</button>
-                        <button onclick="toggleFilterTag(this, 'od')" class="px-3 py-1.5 text-xs rounded-md border border-zinc-600 text-zinc-400 hover:bg-zinc-800 transition-all">OD起始</button>
-                        <button onclick="toggleFilterTag(this, 'dr')" class="px-3 py-1.5 text-xs rounded-md border border-zinc-600 text-zinc-400 hover:bg-zinc-800 transition-all">綠衝起始</button>
-                        <button onclick="toggleFilterTag(this, 'sa')" class="px-3 py-1.5 text-xs rounded-md border border-zinc-600 text-zinc-400 hover:bg-zinc-800 transition-all">SA起始</button>
-                    </div>
-                </div>
-                
-                <div>
-                    <div class="text-xs text-zinc-500 mb-3 font-bold tracking-wider">TAGS</div>
-                    <div class="flex flex-wrap gap-2 justify-center" id="filterExtras">
-                        <button onclick="toggleFilterTag(this, 'corner')" class="px-3 py-1.5 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:border-amber-700 hover:text-amber-500 transition-all">版邊限定</button>
-                        <button onclick="toggleFilterTag(this, 'punish')" class="px-3 py-1.5 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:border-red-700 hover:text-red-500 transition-all">確反</button>
-                        <button onclick="toggleFilterTag(this, 'kill')" class="px-3 py-1.5 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:border-emerald-700 hover:text-emerald-500 transition-all">斬殺</button>
-                        <button onclick="toggleFilterTag(this, 'SA1')" class="px-3 py-1.5 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:border-blue-700 hover:text-blue-400 transition-all">SA1</button>
-                        <button onclick="toggleFilterTag(this, 'SA2')" class="px-3 py-1.5 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:border-blue-700 hover:text-blue-400 transition-all">SA2</button>
-                        <button onclick="toggleFilterTag(this, 'SA3')" class="px-3 py-1.5 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:border-blue-700 hover:text-blue-400 transition-all">SA3</button>
-                    </div>
-                </div>
-                
-                <div class="pt-4 border-t border-zinc-800 flex justify-end">
-                    <button onclick="resetFilters()" class="group flex items-center gap-2 px-4 py-2 rounded-md text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all border border-zinc-700 hover:border-zinc-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:rotate-180 transition-transform duration-500"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-                        <span>重置篩選</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div id="builderSection" class="hidden mb-6 relative animate-[fadeIn_0.2s_ease-out]">
-          <div class="builder-shell rounded-xl border border-zinc-700 shadow-2xl overflow-hidden">
-            <div class="border-b border-zinc-700 px-5 py-3 flex items-center justify-between bg-zinc-950/70">
-              <h2 class="text-lg text-purple-100 font-bold flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.8)]"></span>
-                <span id="builderTitle">Combos</span>
-              </h2>
-              <span class="text-[10px] uppercase tracking-[0.2em] text-zinc-500">BUILDER</span>
-            </div>
-
-            <div class="p-5 space-y-5 bg-zinc-950/80">
-              <div class="builder-block">
-                <div class="flex justify-between items-center mb-3">
-                    <label class="text-sm text-purple-200 font-semibold tracking-wide">連段步驟</label>
-                    <span class="text-xs text-zinc-400">Enter 或 +</span>
-                </div>
-                <div id="comboPreview" class="preview-container mb-3">
-                    <span class="preview-placeholder">輸入指令後顯示於此...</span>
-                </div>
-                <div class="input-group flex w-full">
-                    <input type="text" id="stepInput" class="input-field" placeholder="例如: 2MP, 5HP, DRC...">
-                    <button id="addStepBtn" class="add-btn-input">+</button>
-                </div>
-              </div>
-
-              <div class="builder-block">
-                <div class="flex justify-between items-center mb-3">
-                    <label class="text-sm text-blue-200 font-semibold tracking-wide">壓起身選項</label>
-                    <div class="flex items-center gap-3">
-                        <label class="text-xs text-gray-300">有利幀</label>
-                        <input type="text" id="frameInput" class="input-field !w-20 !py-1 !px-2 text-center text-green-300" placeholder="+42">
-                    </div>
-                </div>
-                <div id="okiPreview" class="preview-container mb-3 !gap-2">
-                    <span class="preview-placeholder">點擊 + 增加選項...</span>
-                </div>
-                <div class="input-group flex w-full">
-                    <input type="text" id="okiStepInput" class="input-field" placeholder="例如: 投, Shimmy...">
-                    <button id="addOkiBtn" class="add-btn-input">+</button>
-                </div>
-              </div>
-
-              <div class="builder-block">
-                <div class="flex items-center justify-between">
-                    <div class="flex-1 mr-4">
-                        <div class="flex items-center justify-between mb-2">
-                             <label class="text-sm text-rose-200 font-semibold tracking-wide">傷害數值</label>
-                        </div>
-                        <input type="number" id="dmgInput" class="input-field text-rose-100" placeholder="例如 2,500">
-                    </div>
-                    <div class="text-right">
-                        <label class="text-sm text-emerald-200 font-semibold tracking-wide block mb-2">鬥氣消耗</label>
-                        <div class="flex items-center justify-end gap-3">
-                            <span id="driveDisplay" class="input-field text-emerald-300 w-16 font-bold bg-gradient-to-r from-emerald-900/30 to-emerald-900/50 border-emerald-500/50 centered-display">
-                              0
-                            </span>
-                        </div>
-                    </div>
-                </div>
-              </div>
-
-              <div class="builder-block">
-                <div class="flex justify-between items-center mb-3">
-                   <label class="text-sm text-purple-200 font-semibold tracking-wide">特殊標籤</label>
-                   <span class="text-xs text-zinc-400">起始標籤將於儲存時自動生成</span>
-                </div>
-                
-                <div class="flex flex-wrap gap-2 justify-center">
-                    <button data-tag-extra="corner" class="tag-extra px-3 py-1.5 text-xs rounded-full border border-zinc-700 text-amber-200 bg-amber-900/30 transition-all">版邊限定</button>
-                    <button data-tag-extra="punish" class="tag-extra px-3 py-1.5 text-xs rounded-full border border-zinc-700 text-red-200 bg-red-900/30 transition-all">確反</button>
-                    <button data-tag-extra="kill"    class="tag-extra px-3 py-1.5 text-xs rounded-full border border-zinc-700 text-emerald-200 bg-emerald-900/30 transition-all">斬殺</button>
-                </div>
-              </div>
-
-              <div class="flex gap-3 pt-2">
-                  <button id="saveBtn" class="flex-1 bg-gradient-to-r from-purple-700 to-purple-600 hover:from-purple-600 hover:to-purple-500 text-white py-3 rounded-xl text-sm shadow-xl font-bold transition-all transform hover:scale-[1.02]">
-                      儲存筆記
-                  </button>
-                  <button onclick="history.back()" class="px-6 text-gray-300 hover:text-white text-sm py-3 rounded-xl border border-zinc-600 hover:border-zinc-400 transition-all">
-                      取消
-                  </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div id="librarySection">
-            <div id="cardList" class="space-y-4 pb-20"></div>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, updateDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-          apiKey: "AIzaSyAog6i-mDornqBzLI-81aeXhS_2eP6kx-A",
-          authDomain: "sf6-notes.firebaseapp.com",
-          projectId: "sf6-notes",
-          storageBucket: "sf6-notes.firebasestorage.app",
-          messagingSenderId: "832506018972",
-          appId: "1:832506018972:web:428aaef84a1aa802d40159",
-          measurementId: "G-39RZ6VTXZ7"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        let currentCharacter = ""; 
-        let allNotes = [];
-        let currentSteps = [];
-        let currentOkiOptions = [];
-        let extraTags = [];
-        let editingNoteId = null; 
-        let editingDocId = null;
-
-        // Filter States
-        let activeFilterTags = [];
-        let currentDriveCap = 6; 
-
-        let characters = ["A.K.I.", "BLANKA", "C.VIPER", "CAMMY", "CHUN-LI", "DEE JAY", "DHALSIM", "E.HONDA", "ED", "ELENA", "GOUKI", "GUILE", "JAMIE", "JP", "JURI", "KEN", "KIMBERLY", "LILY", "LUKE", "MAI", "MANON", "MARISA", "RASHID", "RYU", "TERRY", "VEGA", "ZANGIEF"].sort();
-
-        const previewDiv    = document.getElementById('comboPreview');
-        const stepInput     = document.getElementById('stepInput');
-        const addStepBtn    = document.getElementById('addStepBtn');
-        const saveBtn       = document.getElementById('saveBtn');
-        const cardList      = document.getElementById('cardList');
-        const okiPreview    = document.getElementById('okiPreview');
-        const okiStepInput  = document.getElementById('okiStepInput');
-        const addOkiBtn     = document.getElementById('addOkiBtn');
-        const driveDisplay  = document.getElementById('driveDisplay');
-        const extraButtons   = document.querySelectorAll('[data-tag-extra]');
-        const builderTitle   = document.getElementById('builderTitle');
-        const filterSection  = document.getElementById('filterSection');
-        const driveCostLabel = document.getElementById('driveCostLabel');
-
-        const formatNumber = (num) => Number(num).toLocaleString('en-US');
-
-        window.history.replaceState({ view: 'select' }, '', '');
-
-        window.onpopstate = (event) => {
-            const state = event.state;
-            if (!state || state.view === 'select') {
-                closeBuilderUI();
-                showSelectScreenUI();
-            } else if (state.view === 'content') {
-                closeBuilderUI();
-                document.getElementById('contentScreen').classList.remove('hidden');
-                document.getElementById('navBar').classList.remove('hidden');
-                document.getElementById('charSelectScreen').classList.add('hidden');
-            }
-        };
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                const builder = document.getElementById('builderSection');
-                const filter = document.getElementById('filterSection');
-                
-                if (builder && !builder.classList.contains('hidden')) {
-                    e.preventDefault(); 
-                    if (document.activeElement instanceof HTMLElement) document.activeElement.blur(); 
-                    window.history.back(); 
-                } else if (filter && !filter.classList.contains('hidden')) {
-                    e.preventDefault();
-                    toggleFilter(); 
-                }
-            }
-        });
-
-        window.toggleFilter = () => {
-            filterSection.classList.toggle('hidden');
-        };
-
-        window.toggleFilterTag = (btn, tag) => {
-            if (activeFilterTags.includes(tag)) {
-                activeFilterTags = activeFilterTags.filter(t => t !== tag);
-                btn.classList.remove('bg-purple-700', 'border-purple-500', 'text-white');
-                btn.classList.add('border-zinc-600', 'text-zinc-400');
-            } else {
-                activeFilterTags.push(tag);
-                btn.classList.remove('border-zinc-600', 'text-zinc-400');
-                btn.classList.add('bg-purple-700', 'border-purple-500', 'text-white');
-            }
-            renderNotes();
-        };
-
-        window.setDriveCap = (cap) => {
-            currentDriveCap = cap;
-            updateDriveFilterVisuals();
-            renderNotes();
-        };
-
-        function updateDriveFilterVisuals() {
-            const zeroBtn = document.getElementById('fd-0');
-            if (currentDriveCap >= 0) zeroBtn.classList.add('active'); 
-            else zeroBtn.classList.remove('active');
-
-            for(let i=1; i<=6; i++) {
-                const el = document.getElementById(`fd-${i}`);
-                if (i <= currentDriveCap) {
-                    el.classList.add('active');
-                } else {
-                    el.classList.remove('active');
-                }
-            }
-            
-            driveCostLabel.innerText = currentDriveCap === 6 ? 'ALL' : `MAX ${currentDriveCap}`;
-        }
-
-        window.resetFilters = () => {
-            activeFilterTags = [];
-            currentDriveCap = 6; 
-            
-            document.querySelectorAll('#filterStarters button, #filterExtras button').forEach(btn => {
-                btn.classList.remove('bg-purple-700', 'border-purple-500', 'text-white');
-                btn.classList.add('border-zinc-600', 'text-zinc-400');
+                // 降冪: B - A, 升冪: A - B
+                return isDescending ? (valB - valA) : (valA - valB);
             });
-            updateDriveFilterVisuals();
-            renderNotes();
-        };
 
-        function getStepClass(step) {
-            const upper = step.toUpperCase();
-            if (upper === 'DRC') return 'bg-green-900/40 border-green-600 text-green-100 border';
-            if (upper === 'DR')  return 'bg-green-900/30 border-green-700 text-green-200 border'; 
-            if (upper.includes('SA') || upper.includes('CA')) return 'bg-blue-900/40 border-blue-600 text-blue-100 border';
-            if (upper.includes('OD') || upper.includes('EX') || upper.includes('PP') || upper.includes('KK')) return 'bg-yellow-900/30 border-yellow-600 text-yellow-100 border';
-            return 'bg-gray-700/50 border-gray-600 text-gray-200 border';
-        }
-
-        function primaryTagLabel(tag) {
-            if (tag === 'light') return '輕起始';
-            if (tag === 'medium') return '中起始';
-            if (tag === 'heavy') return '重起始';
-            if (tag === 'od') return 'OD起始';
-            if (tag === 'sa') return 'SA起始';
-            if (tag === 'dr') return '綠衝起始';
-            return null;
-        }
-
-        function extraTagLabel(tag) {
-            if (tag === 'corner') return '版邊限定';
-            if (tag === 'punish') return '確反';
-            if (tag === 'kill') return '斬殺';
-            return tag;
-        }
-
-        function computeDriveCost(steps) {
-            let total = 0;
-            for (const raw of steps) {
-                const s = raw.toUpperCase();
-                if (s === 'DR') total += 1;
-                if (s === 'DRC') total += 3;
-                if (s.includes('OD') || s.includes('EX') || s.includes('PP') || s.includes('KK')) total += 2;
-            }
-            return Math.max(0, Math.min(6, total));
-        }
-
-        function renderCharGrid(list) {
-            document.getElementById('charGrid').innerHTML = list.map(name => `
-                <div class="char-btn" onclick="selectCharacter('${name}')">
-                    <span class="char-name-display">${name}</span>
-                </div>
-            `).join('');
-        }
-
-        function renderPreview() {
-            if (currentSteps.length === 0) {
-                previewDiv.innerHTML = '<span class="preview-placeholder">輸入指令後顯示於此...</span>';
-                driveDisplay.textContent = '0';
-                return;
-            }
-            previewDiv.innerHTML = currentSteps.map((step, idx) => {
-                return `<span class="move-badge ${getStepClass(step)} text-sm">${step}</span>` +
-                       (idx < currentSteps.length-1 ? `<span class="text-purple-500 font-bold">➜</span>` : '');
-            }).join('');
-            driveDisplay.textContent = computeDriveCost(currentSteps);
-        }
-
-        function renderOkiPreview() {
-            if (currentOkiOptions.length === 0) {
-                okiPreview.innerHTML = '<span class="preview-placeholder">點擊 + 增加選項...</span>';
-                return;
-            }
-            okiPreview.innerHTML = currentOkiOptions.map(opt => 
-                `<div class="w-full bg-zinc-800/50 border border-zinc-700 rounded px-3 py-2 text-sm text-gray-300 flex items-center justify-center">
-                    <span class="text-green-500 mr-2">➜</span>${opt}
-                 </div>`
-            ).join('');
-        }
-
-        function renderNotes() {
-            let charNotes = allNotes.filter(n => n.char === currentCharacter);
-
-            if (activeFilterTags.length > 0 || currentDriveCap < 6) {
-                charNotes = charNotes.filter(note => {
-                    const cost = Number(note.drive) || 0;
-                    if (cost > currentDriveCap) return false;
-
-                    if (activeFilterTags.length > 0) {
-                        const noteTags = [];
-                        if (note.primaryTag) noteTags.push(note.primaryTag);
-                        if (note.extraTags) noteTags.push(...note.extraTags);
-                        
-                        const combinedSteps = note.steps.join(' ').toUpperCase();
-                        if (combinedSteps.includes('SA1')) noteTags.push('SA1');
-                        if (combinedSteps.includes('SA2')) noteTags.push('SA2');
-                        if (combinedSteps.includes('SA3') || combinedSteps.includes('CA')) noteTags.push('SA3');
-
-                        const allSelectedTagsFound = activeFilterTags.every(selectedTag => noteTags.includes(selectedTag));
-                        if (!allSelectedTagsFound) return false;
-                    }
-                    return true;
-                });
-            }
-
-            if (charNotes.length === 0) {
-                cardList.innerHTML = `
-                    <div class="text-center text-gray-500 mt-10 border border-dashed border-zinc-800 p-10 rounded-xl">
-                        <p class="text-xl font-bold">無符合資料</p>
-                    </div>`;
-                return;
-            }
-            
-            cardList.innerHTML = [...charNotes].reverse().map(note => {
-                const pLabel = primaryTagLabel(note.primaryTag);
-                const extras = note.extraTags || [];
-                
-                let saTagsHtml = '';
-                const combinedSteps = note.steps.join(' ').toUpperCase(); 
-                if (combinedSteps.includes('SA1')) saTagsHtml += `<span class="tag-pill tag-sa">SA1</span>`;
-                if (combinedSteps.includes('SA2')) saTagsHtml += `<span class="tag-pill tag-sa">SA2</span>`;
-                if (combinedSteps.includes('SA3') || combinedSteps.includes('CA')) saTagsHtml += `<span class="tag-pill tag-sa">SA3</span>`;
-
-                let tagHtml = '';
-                if (pLabel) tagHtml += `<span class="tag-pill border-purple-500/50 text-purple-300 bg-purple-900/20">${pLabel}</span>`;
-                tagHtml += saTagsHtml; 
-                tagHtml += extras.map(t => `<span class="tag-pill">${extraTagLabel(t)}</span>`).join('');
-
-                let movesHtml = note.steps.map((step, idx) => {
-                    return `
-                    <div class="move-badge ${getStepClass(step)}">${step}</div>
-                    ${idx < note.steps.length-1 ? '<span class="text-purple-500 font-bold text-lg">➜</span>' : ''}
-                    `;
-                }).join('');
-
-                const driveVal = Number(note.drive) || 0;
-                let driveHtml = '';
-                for(let i=0; i<6; i++) {
-                    const activeClass = i < driveVal ? 'bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.8)]' : 'bg-gray-700';
-                    driveHtml += `<div class="h-2 w-3 drive-skew rounded-sm ${activeClass}"></div>`;
-                }
-
-                const okiLines = note.okiRaw ? note.okiRaw.split('\n').filter(l => l.trim() !== "") : [];
-                let okiHtml = okiLines.length > 0 
-                    ? okiLines.map(l => `<div class="flex items-center gap-2 text-gray-300 py-1"><span class="text-green-500">➜</span>${l}</div>`).join('')
-                    : '<div class="text-gray-600 text-sm">無後續設定</div>';
-
-                return `
-                <div id="card-${note.id}" class="strategy-card">
-                    <div class="p-4" onclick="toggleCard('${note.id}')">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="flex flex-wrap gap-2">${tagHtml}</div>
-                            <div id="dmg-preview-${note.id}" class="text-xl font-bold font-mono text-white tracking-wider">
-                                ${formatNumber(note.dmg)}
-                            </div>
-                        </div>
-
-                        <div class="flex flex-wrap items-center gap-3">
-                            ${movesHtml}
-                        </div>
+            // 產生卡片
+            sorted.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `
+                    <div class="card-header">
+                        <span class="combo-name">${item.name}</span>
                     </div>
-
-                    <div id="expand-${note.id}" class="hidden bg-[#1a1a1e] border-t border-zinc-800 p-4 animate-[fadeIn_0.2s_ease-out]">
-                        <div class="flex justify-between items-end">
-                            <div class="flex flex-col gap-2 w-full">
-                                <div class="flex justify-between items-end border-b border-zinc-700/50 pb-2 mb-2">
-                                    <div>
-                                        <div class="text-xs text-gray-500 font-mono tracking-widest">DAMAGE</div>
-                                        <div class="text-4xl font-bold font-mono text-white">${formatNumber(note.dmg)}</div>
-                                    </div>
-                                    <div class="text-right">
-                                         <div class="text-xs text-gray-500 mb-1">ADVANTAGE</div>
-                                         <div class="text-2xl font-bold font-mono text-blue-300">${note.frame}F</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="flex items-center gap-2 mb-2">
-                                    <span class="text-xs text-gray-500">DRIVE</span>
-                                    <div class="flex gap-0.5">${driveHtml}</div>
-                                </div>
-
-                                <div class="mt-2 bg-zinc-900/50 rounded p-3 border border-zinc-700/50">
-                                    <div class="text-xs text-gray-500 mb-2 uppercase tracking-wider">Oki / Setup</div>
-                                    ${okiHtml}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="flex justify-end mt-4 pt-2 border-t border-zinc-800/50 items-center gap-2">
-                            <button onclick="event.stopPropagation(); startEdit(${note.id})" 
-                                class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-gray-500 hover:text-blue-400 hover:bg-blue-950/30 transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
-                                </svg>
-                                <span>修改</span>
-                            </button>
-
-                            <button id="del-btn-${note.id}" onclick="event.stopPropagation(); requestDelete('${note.id}')" 
-                                class="group flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-gray-500 hover:text-red-400 hover:bg-red-950/30 transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                <span>刪除</span>
-                            </button>
-                            <div id="del-confirm-${note.id}" class="hidden flex items-center gap-3 bg-red-950/20 px-3 py-1 rounded-lg border border-red-900/50">
-                                <span class="text-sm text-red-200 font-bold">確定?</span>
-                                <button onclick="event.stopPropagation(); confirmDelete('${note.docId}')" class="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded">是</button>
-                                <button onclick="event.stopPropagation(); cancelDelete('${note.id}')" class="bg-gray-700 hover:bg-gray-600 text-white text-xs px-3 py-1.5 rounded">否</button>
-                            </div>
-                        </div>
+                    <div class="stats">
+                        <span>傷害: <span class="stat-val" style="color:#ff5252">${item.damage}</span></span>
+                        <span>Cost: <span class="stat-val" style="color:#4facfe">${item.cost}</span></span>
                     </div>
-                </div>
                 `;
-            }).join('');
-        }
-
-        window.toggleCard = (id) => {
-            const card = document.getElementById(`card-${id}`);
-            const expandSection = document.getElementById(`expand-${id}`);
-            const dmgPreview = document.getElementById(`dmg-preview-${id}`);
-            
-            if (expandSection.classList.contains('hidden')) {
-                expandSection.classList.remove('hidden');
-                card.classList.add('expanded');
-                dmgPreview.classList.add('opacity-0');
-            } else {
-                expandSection.classList.add('hidden');
-                card.classList.remove('expanded');
-                dmgPreview.classList.remove('opacity-0');
-                window.cancelDelete(id); 
-            }
-        };
-
-        window.requestDelete = (id) => {
-            document.getElementById(`del-btn-${id}`).classList.add('hidden');
-            document.getElementById(`del-confirm-${id}`).classList.remove('hidden');
-            document.getElementById(`del-confirm-${id}`).classList.add('flex');
-        };
-
-        window.cancelDelete = (id) => {
-            document.getElementById(`del-btn-${id}`).classList.remove('hidden');
-            document.getElementById(`del-confirm-${id}`).classList.add('hidden');
-            document.getElementById(`del-confirm-${id}`).classList.remove('flex');
-        };
-
-        window.confirmDelete = async (docId) => {
-            if(!docId) return;
-            await deleteDoc(doc(db, "notes", docId));
-            loadNotesFromCloud(); 
-        };
-
-        window.selectCharacter = async (name) => {
-            currentCharacter = name;
-            window.history.pushState({ view: 'content', char: name }, '', '');
-            
-            resetFilters(); 
-            filterSection.classList.add('hidden');
-
-            showContentScreenUI(name);
-            await loadNotesFromCloud();
-        };
-
-        function showContentScreenUI(name) {
-            document.getElementById('charSelectScreen').classList.add('hidden');
-            document.getElementById('contentScreen').classList.remove('hidden');
-            document.getElementById('navBar').classList.remove('hidden');
-            document.getElementById('navTitle').innerText = name;
-        }
-
-        function showSelectScreenUI() {
-            document.getElementById('contentScreen').classList.add('hidden');
-            document.getElementById('navBar').classList.add('hidden');
-            document.getElementById('charSelectScreen').classList.remove('hidden');
-        }
-
-        function closeBuilderUI() {
-            document.getElementById('builderSection').classList.add('hidden');
-            document.getElementById('addBtn').classList.remove('hidden');
-        }
-
-        async function loadNotesFromCloud() {
-            allNotes = [];
-            const q = query(collection(db, "notes"), where("char", "==", currentCharacter));
-            const snap = await getDocs(q);
-            snap.forEach(docSnap => allNotes.push({ id: docSnap.data().id, docId: docSnap.id, ...docSnap.data() }));
-            renderNotes();
-        }
-
-        window.startEdit = (noteId) => {
-            const note = allNotes.find(n => n.id === noteId);
-            if (!note) return;
-
-            editingNoteId = note.id;
-            editingDocId = note.docId;
-            builderTitle.innerText = "Edit Combo";
-
-            currentSteps = [...note.steps];
-            currentOkiOptions = note.okiRaw ? note.okiRaw.split('\n') : [];
-            extraTags = note.extraTags || [];
-
-            document.getElementById('dmgInput').value = note.dmg;
-            document.getElementById('frameInput').value = note.frame;
-
-            renderPreview();
-            renderOkiPreview();
-            
-            extraButtons.forEach(btn => {
-                const tag = btn.getAttribute('data-tag-extra');
-                if (extraTags.includes(tag)) {
-                    btn.classList.add('ring-2','ring-offset-1','ring-offset-zinc-900','bg-opacity-60');
-                } else {
-                    btn.classList.remove('ring-2','ring-offset-1','ring-offset-zinc-900','bg-opacity-60');
-                }
+                container.appendChild(div);
             });
 
-            openBuilder();
-        };
-
-        window.openBuilder = () => {
-            if (!editingNoteId) {
-                resetBuilderForm();
-                builderTitle.innerText = "New Combo";
-            }
-            window.history.pushState({ view: 'builder' }, '', '');
-            document.getElementById('builderSection').classList.remove('hidden');
-            document.getElementById('addBtn').classList.add('hidden');
-            stepInput.focus();
-        };
-
-        window.closeBuilder = () => {
-            window.history.back();
-        };
-
-        const originalCloseBuilderUI = closeBuilderUI;
-        closeBuilderUI = () => {
-            document.getElementById('builderSection').classList.add('hidden');
-            document.getElementById('addBtn').classList.remove('hidden');
-            editingNoteId = null; 
-            editingDocId = null;
-            resetBuilderForm();
-        };
-
-        function resetBuilderForm() {
-            currentSteps = []; 
-            currentOkiOptions = []; 
-            extraTags = [];
-            renderPreview(); 
-            renderOkiPreview();
-            document.getElementById('dmgInput').value = ""; 
-            document.getElementById('frameInput').value = "";
-            extraButtons.forEach(b => b.classList.remove('ring-2','ring-offset-1','ring-offset-zinc-900','bg-opacity-60'));
+            // 更新按鈕狀態
+            sortIcon.textContent = isDescending ? '⬇' : '⬆';
+            sortText.textContent = isDescending ? '高 → 低' : '低 → 高';
         }
 
-        function determineStarterTag(firstStep) {
-            if (!firstStep) return null;
-            const s = firstStep.toUpperCase();
-            
-            if (s.includes('PP') || s.includes('KK') || s.includes('OD')) return 'od';
-            if (s.startsWith('SA') || s.startsWith('CA')) return 'sa';
-            if (s === 'DR') return 'dr';
-            if (s.includes('H')) return 'heavy';
-            if (s.includes('M')) return 'medium';
-            if (s.includes('L')) return 'light';
-            return null;
-        }
-
-        addStepBtn.addEventListener('click', () => {
-            if (stepInput.value.trim()) {
-                currentSteps.push(stepInput.value.trim().toUpperCase());
-                stepInput.value = ""; renderPreview();
-            }
-        });
-        
-        addOkiBtn.addEventListener('click', () => {
-            if (okiStepInput.value.trim()) {
-                currentOkiOptions.push(okiStepInput.value.trim());
-                okiStepInput.value = ""; renderOkiPreview();
-            }
+        // 監聽
+        sortSelect.addEventListener('change', (e) => {
+            currentSortKey = e.target.value;
+            render();
         });
 
-        stepInput.addEventListener('input', function() { this.value = this.value.toUpperCase(); });
-        stepInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && stepInput.value.trim()) {
-                currentSteps.push(stepInput.value.trim().toUpperCase());
-                stepInput.value = ""; renderPreview();
-            } else if (e.key === 'Backspace' && !stepInput.value && currentSteps.length) {
-                currentSteps.pop(); renderPreview();
-            }
+        sortBtn.addEventListener('click', () => {
+            isDescending = !isDescending;
+            render();
         });
 
-        okiStepInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && okiStepInput.value.trim()) {
-                currentOkiOptions.push(okiStepInput.value.trim());
-                okiStepInput.value = ""; renderOkiPreview();
-            } else if (e.key === 'Backspace' && !okiStepInput.value && currentOkiOptions.length) {
-                currentOkiOptions.pop(); renderOkiPreview();
-            }
-        });
-
-        extraButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tag = btn.getAttribute('data-tag-extra');
-                if (extraTags.includes(tag)) {
-                    extraTags = extraTags.filter(t => t !== tag);
-                } else {
-                    extraTags.push(tag);
-                }
-                if (extraTags.includes(tag)) {
-                    btn.classList.add('ring-2','ring-offset-1','ring-offset-zinc-900','bg-opacity-60');
-                } else {
-                    btn.classList.remove('ring-2','ring-offset-1','ring-offset-zinc-900','bg-opacity-60');
-                }
-            });
-        });
-
-        saveBtn.addEventListener('click', async () => {
-            const dmgInputEl = document.getElementById('dmgInput');
-            const dmgValue = dmgInputEl.value.trim();
-            if (!currentSteps.length || !dmgValue) return alert("連段與傷害為必填");
-
-            const autoPrimaryTag = determineStarterTag(currentSteps[0]);
-
-            const noteData = {
-                char: currentCharacter,
-                steps: [...currentSteps],
-                okiRaw: currentOkiOptions.join('\n'),
-                frame: document.getElementById('frameInput').value || "0",
-                dmg: dmgValue,
-                drive: computeDriveCost(currentSteps),
-                primaryTag: autoPrimaryTag, 
-                extraTags: [...extraTags]
-            };
-
-            if (editingNoteId && editingDocId) {
-                await updateDoc(doc(db, "notes", editingDocId), noteData);
-            } else {
-                noteData.id = Date.now();
-                await addDoc(collection(db, "notes"), noteData);
-            }
-            
-            window.history.back(); 
-            loadNotesFromCloud();
-        });
-
-        renderCharGrid(characters);
+        // 啟動
+        render();
     </script>
 </body>
 </html>
