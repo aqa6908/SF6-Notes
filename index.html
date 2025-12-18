@@ -184,7 +184,7 @@
         <button onclick="history.back()" class="text-gray-400 hover:text-white flex items-center text-sm font-bold transition">
             <span class="mr-1 text-xl">‹</span> 選角
         </button>
-        <h1 class="text-3xl font-bold text-white fight-font tracking-widest text-shadow" id="navTitle">RYU</h1>
+        <h1 class="absolute left-1/2 -translate-x-1/2 text-3xl font-bold text-white fight-font tracking-widest text-shadow" id="navTitle">RYU</h1>
         <button onclick="openBuilder()" id="addBtn" class="bg-purple-700 hover:bg-purple-600 text-white px-4 py-1.5 rounded text-sm font-bold shadow-[0_0_10px_rgba(168,85,247,0.5)] transition">
             + NEW
         </button>
@@ -347,16 +347,15 @@
             }
         };
 
-        // 強化的 ESC 監聽邏輯
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 const builder = document.getElementById('builderSection');
                 if (builder && !builder.classList.contains('hidden')) {
-                    e.preventDefault(); // 防止預設行為
+                    e.preventDefault(); 
                     if (document.activeElement instanceof HTMLElement) {
-                        document.activeElement.blur(); // 強制失焦
+                        document.activeElement.blur(); 
                     }
-                    window.history.back(); // 觸發返回
+                    window.history.back(); 
                 }
             }
         });
