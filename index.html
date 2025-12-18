@@ -10,6 +10,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Teko:wght@500;600&display=swap');
         
         body { 
+            /* 修正：移除標楷體，改回無襯線黑體 */
             font-family: 'Microsoft JhengHei', 'Microsoft YaHei', sans-serif; 
             background-color: #050509; 
             color: #d4d4d8; 
@@ -136,6 +137,23 @@
         
         .icon-rotate { transition: transform 0.3s ease; }
         .rotate-180 { transform: rotate(180deg); }
+
+        /* Oki List Styles */
+        .oki-input-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; animation: fadeIn 0.2s ease-out; }
+        .oki-input { 
+            flex: 1; 
+            background: #18181b; 
+            border: 1px solid #3f3f46; 
+            color: #e4e4e7;
+            border-radius: 6px; 
+            padding: 8px 12px; 
+            font-size: 0.95rem;
+        }
+        .oki-input:focus { border-color: #3b82f6; outline: none; background: #27272a; }
+        .oki-del-btn {
+            color: #ef4444; padding: 8px; cursor: pointer; border-radius: 6px; transition: background 0.2s;
+        }
+        .oki-del-btn:hover { background: rgba(239, 68, 68, 0.1); }
     </style>
 </head>
 <body class="pb-20">
@@ -166,18 +184,13 @@
 
         <div id="filterSection" class="hidden mb-6 bg-[#18181b] border border-zinc-700 rounded-xl p-5 shadow-2xl animate-[fadeIn_0.15s_ease-out]">
             <div class="space-y-6">
-                
                 <div>
                     <div class="flex justify-between items-end mb-3">
                         <div class="text-xs text-zinc-500 font-bold tracking-wider">MAX DRIVE</div>
                         <div id="driveCostLabel" class="text-sm text-green-400 font-mono font-bold">ALL</div>
                     </div>
-                    
                     <div class="flex items-center justify-between gap-3 px-1">
-                        <div onclick="setDriveCap(0)" class="filter-zero-btn active" id="fd-0">
-                            無消耗
-                        </div>
-                        
+                        <div onclick="setDriveCap(0)" class="filter-zero-btn active" id="fd-0">無消耗</div>
                         <div class="flex gap-1">
                             <div onclick="setDriveCap(1)" class="drive-bar-lg active" id="fd-1"></div>
                             <div onclick="setDriveCap(2)" class="drive-bar-lg active" id="fd-2"></div>
@@ -188,9 +201,7 @@
                         </div>
                     </div>
                 </div>
-
                 <hr class="border-zinc-800">
-
                 <div>
                     <div class="text-xs text-zinc-500 mb-3 font-bold tracking-wider">STARTER</div>
                     <div class="grid grid-cols-3 gap-2" id="filterStarters">
@@ -202,7 +213,6 @@
                         <button onclick="toggleFilterTag(this, 'sa')" class="px-2 py-1.5 text-xs rounded-md border border-zinc-600 text-zinc-400 hover:bg-zinc-800 transition-all text-center">SA起始</button>
                     </div>
                 </div>
-                
                 <div>
                     <div class="text-xs text-zinc-500 mb-3 font-bold tracking-wider">TAGS</div>
                     <div class="grid grid-cols-3 gap-2" id="filterExtras">
@@ -214,7 +224,6 @@
                         <button onclick="toggleFilterTag(this, 'SA3')" class="px-2 py-1.5 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:border-blue-700 hover:text-blue-400 transition-all text-center">SA3</button>
                     </div>
                 </div>
-                
                 <div class="pt-4 border-t border-zinc-800 flex justify-end">
                     <button onclick="resetFilters()" class="group flex items-center gap-2 px-4 py-2 rounded-md text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all border border-zinc-700 hover:border-zinc-500">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:rotate-180 transition-transform duration-500"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
@@ -235,7 +244,6 @@
                     <svg class="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
                 </div>
             </div>
-
             <button id="sortDirBtn" class="sort-btn-icon" title="切換順序">
                 <svg id="sortIconSvg" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-rotate rotate-180"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
             </button>
@@ -252,60 +260,55 @@
             </div>
 
             <div class="p-5 space-y-5 bg-zinc-950/80">
+              
               <div class="builder-block">
-                <div class="flex justify-between items-center mb-3">
-                    <label class="text-sm text-purple-200 font-semibold tracking-wide">連段步驟</label>
-                    <span class="text-xs text-zinc-400">Enter 或 +</span>
+                <div class="mb-5">
+                    <div class="flex justify-between items-center mb-3">
+                        <label class="text-sm text-purple-200 font-semibold tracking-wide">連段步驟 (Combo)</label>
+                        <span class="text-xs text-zinc-400">Enter 或 +</span>
+                    </div>
+                    <div id="comboPreview" class="preview-container mb-3">
+                        <span class="preview-placeholder">輸入指令後顯示於此...</span>
+                    </div>
+                    <div class="input-group flex w-full">
+                        <input type="text" id="stepInput" class="input-field" placeholder="例如: 2MP, 5HP, DRC...">
+                        <button id="addStepBtn" class="add-btn-input">+</button>
+                    </div>
                 </div>
-                <div id="comboPreview" class="preview-container mb-3">
-                    <span class="preview-placeholder">輸入指令後顯示於此...</span>
-                </div>
-                <div class="input-group flex w-full">
-                    <input type="text" id="stepInput" class="input-field" placeholder="例如: 2MP, 5HP, DRC...">
-                    <button id="addStepBtn" class="add-btn-input">+</button>
+
+                <div class="grid grid-cols-12 gap-4 items-end">
+                    <div class="col-span-5">
+                        <label class="text-sm text-rose-200 font-semibold tracking-wide block mb-2">傷害 (Dmg)</label>
+                        <input type="number" id="dmgInput" class="input-field text-rose-100" placeholder="2500">
+                    </div>
+                    <div class="col-span-4">
+                        <label class="text-sm text-blue-300 font-semibold tracking-wide block mb-2">有利幀 (Frame)</label>
+                        <input type="text" id="frameInput" class="input-field text-center text-blue-100 font-bold bg-blue-900/20 border-blue-800 focus:border-blue-500" placeholder="+0">
+                    </div>
+                    <div class="col-span-3 text-right">
+                         <label class="text-sm text-emerald-200 font-semibold tracking-wide block mb-2">氣條</label>
+                        <span id="driveDisplay" class="input-field justify-center text-emerald-300 font-bold bg-emerald-900/20 border-emerald-800">0</span>
+                    </div>
                 </div>
               </div>
 
               <div class="builder-block">
                 <div class="flex justify-between items-center mb-3">
-                    <label class="text-sm text-blue-200 font-semibold tracking-wide">壓起身選項</label>
-                    <div class="flex items-center gap-3">
-                        <label class="text-xs text-gray-300">有利幀</label>
-                        <input type="text" id="frameInput" class="input-field !w-20 !py-1 !px-2 text-center text-green-300" placeholder="+42">
+                    <label class="text-sm text-green-400 font-semibold tracking-wide">壓起身對策 (Oki Options)</label>
+                    <span class="text-xs text-zinc-500">Enter 新增下一行</span>
+                </div>
+                
+                <div id="okiListContainer" class="flex flex-col gap-2 mb-3">
                     </div>
-                </div>
-                <div id="okiPreview" class="preview-container mb-3 !gap-2">
-                    <span class="preview-placeholder">點擊 + 增加選項...</span>
-                </div>
-                <div class="input-group flex w-full">
-                    <input type="text" id="okiStepInput" class="input-field" placeholder="例如: 投, Shimmy...">
-                    <button id="addOkiBtn" class="add-btn-input">+</button>
-                </div>
-              </div>
 
-              <div class="builder-block">
-                <div class="flex items-center justify-between">
-                    <div class="flex-1 mr-4">
-                        <div class="flex items-center justify-between mb-2">
-                             <label class="text-sm text-rose-200 font-semibold tracking-wide">傷害數值</label>
-                        </div>
-                        <input type="number" id="dmgInput" class="input-field text-rose-100" placeholder="例如 2,500">
-                    </div>
-                    <div class="text-right">
-                        <label class="text-sm text-emerald-200 font-semibold tracking-wide block mb-2">鬥氣消耗</label>
-                        <div class="flex items-center justify-end gap-3">
-                            <span id="driveDisplay" class="input-field text-emerald-300 w-16 font-bold bg-gradient-to-r from-emerald-900/30 to-emerald-900/50 border-emerald-500/50 centered-display">
-                              0
-                            </span>
-                        </div>
-                    </div>
-                </div>
+                <button onclick="addOkiRow()" class="w-full py-2 border border-dashed border-zinc-600 rounded-lg text-zinc-400 hover:text-white hover:border-zinc-400 hover:bg-zinc-800 transition-all text-sm font-bold">
+                    + 新增選項
+                </button>
               </div>
 
               <div class="builder-block">
                 <div class="flex justify-between items-center mb-3">
                    <label class="text-sm text-purple-200 font-semibold tracking-wide">特殊標籤</label>
-                   <span class="text-xs text-zinc-400">起始標籤將於儲存時自動生成</span>
                 </div>
                 
                 <div class="flex flex-wrap gap-2 justify-center">
@@ -352,6 +355,7 @@
         let currentCharacter = ""; 
         let allNotes = [];
         let currentSteps = [];
+        // currentOkiOptions now holds the strings for the list inputs
         let currentOkiOptions = [];
         let extraTags = [];
         let editingNoteId = null; 
@@ -372,14 +376,12 @@
         const addStepBtn    = document.getElementById('addStepBtn');
         const saveBtn       = document.getElementById('saveBtn');
         const cardList      = document.getElementById('cardList');
-        const okiPreview    = document.getElementById('okiPreview');
-        const okiStepInput  = document.getElementById('okiStepInput');
-        const addOkiBtn     = document.getElementById('addOkiBtn');
         const driveDisplay  = document.getElementById('driveDisplay');
         const extraButtons   = document.querySelectorAll('[data-tag-extra]');
         const builderTitle   = document.getElementById('builderTitle');
         const filterSection  = document.getElementById('filterSection');
         const driveCostLabel = document.getElementById('driveCostLabel');
+        const okiListContainer = document.getElementById('okiListContainer');
 
         // Sort UI Elements
         const sortSelect = document.getElementById('sortSelect');
@@ -549,17 +551,70 @@
             driveDisplay.textContent = computeDriveCost(currentSteps);
         }
 
-        function renderOkiPreview() {
+        // --- NEW OKI LIST LOGIC ---
+        
+        window.addOkiRow = () => {
+            currentOkiOptions.push("");
+            renderDynamicOkiList(true); // true = focus the last added element
+        };
+
+        window.updateOkiRow = (index, value) => {
+            currentOkiOptions[index] = value;
+        };
+
+        window.deleteOkiRow = (index) => {
+            currentOkiOptions.splice(index, 1);
+            renderDynamicOkiList(false);
+        };
+
+        // Render the list of inputs
+        function renderDynamicOkiList(focusLast = false) {
+            okiListContainer.innerHTML = "";
             if (currentOkiOptions.length === 0) {
-                okiPreview.innerHTML = '<span class="preview-placeholder">點擊 + 增加選項...</span>';
-                return;
+                 // Option to show empty state or just leave blank. 
+                 // Let's ensure at least one row if user wants? Or just blank.
+                 // We will leave blank but user can click "+ New".
             }
-            okiPreview.innerHTML = currentOkiOptions.map(opt => 
-                `<div class="w-full bg-zinc-800/50 border border-zinc-700 rounded px-3 py-2 text-sm text-gray-300 flex items-center justify-center">
-                    <span class="text-green-500 mr-2">➜</span>${opt}
-                 </div>`
-            ).join('');
+
+            currentOkiOptions.forEach((opt, idx) => {
+                const row = document.createElement('div');
+                row.className = 'oki-input-row';
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'oki-input';
+                input.placeholder = '輸入壓起身對策...';
+                input.value = opt;
+                
+                // Update array on input
+                input.addEventListener('input', (e) => {
+                    updateOkiRow(idx, e.target.value);
+                });
+
+                // Keydown logic for Enter
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        // Add new row after this
+                        addOkiRow();
+                    }
+                });
+
+                const delBtn = document.createElement('div');
+                delBtn.className = 'oki-del-btn';
+                delBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+                delBtn.onclick = () => deleteOkiRow(idx);
+
+                row.appendChild(input);
+                row.appendChild(delBtn);
+                okiListContainer.appendChild(row);
+
+                if (focusLast && idx === currentOkiOptions.length - 1) {
+                    setTimeout(() => input.focus(), 0);
+                }
+            });
         }
+        // --------------------------
 
         function renderNotes() {
             let charNotes = allNotes.filter(n => n.char === currentCharacter);
@@ -800,14 +855,17 @@
             builderTitle.innerText = "Edit Combo";
 
             currentSteps = [...note.steps];
-            currentOkiOptions = note.okiRaw ? note.okiRaw.split('\n') : [];
+            // Split by newline for the list
+            currentOkiOptions = note.okiRaw ? note.okiRaw.split('\n') : [""];
+            if (currentOkiOptions.length === 0) currentOkiOptions = [""];
+            
             extraTags = note.extraTags || [];
 
             document.getElementById('dmgInput').value = note.dmg;
             document.getElementById('frameInput').value = note.frame;
 
             renderPreview();
-            renderOkiPreview();
+            renderDynamicOkiList();
             
             extraButtons.forEach(btn => {
                 const tag = btn.getAttribute('data-tag-extra');
@@ -847,10 +905,10 @@
 
         function resetBuilderForm() {
             currentSteps = []; 
-            currentOkiOptions = []; 
+            currentOkiOptions = [""]; // Default one empty row
             extraTags = [];
             renderPreview(); 
-            renderOkiPreview();
+            renderDynamicOkiList();
             document.getElementById('dmgInput').value = ""; 
             document.getElementById('frameInput').value = "";
             extraButtons.forEach(b => b.classList.remove('ring-2','ring-offset-1','ring-offset-zinc-900','bg-opacity-60'));
@@ -875,13 +933,6 @@
                 stepInput.value = ""; renderPreview();
             }
         });
-        
-        addOkiBtn.addEventListener('click', () => {
-            if (okiStepInput.value.trim()) {
-                currentOkiOptions.push(okiStepInput.value.trim());
-                okiStepInput.value = ""; renderOkiPreview();
-            }
-        });
 
         stepInput.addEventListener('input', function() { this.value = this.value.toUpperCase(); });
         stepInput.addEventListener('keydown', (e) => {
@@ -890,15 +941,6 @@
                 stepInput.value = ""; renderPreview();
             } else if (e.key === 'Backspace' && !stepInput.value && currentSteps.length) {
                 currentSteps.pop(); renderPreview();
-            }
-        });
-
-        okiStepInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && okiStepInput.value.trim()) {
-                currentOkiOptions.push(okiStepInput.value.trim());
-                okiStepInput.value = ""; renderOkiPreview();
-            } else if (e.key === 'Backspace' && !okiStepInput.value && currentOkiOptions.length) {
-                currentOkiOptions.pop(); renderOkiPreview();
             }
         });
 
@@ -924,12 +966,15 @@
             if (!currentSteps.length || !dmgValue) return alert("連段與傷害為必填");
 
             const autoPrimaryTag = determineStarterTag(currentSteps[0]);
+            
+            // Join the list back into a string for storage
+            const finalOkiRaw = currentOkiOptions.filter(o => o.trim() !== "").join('\n');
 
             const noteData = {
                 char: currentCharacter,
                 steps: [...currentSteps],
-                okiRaw: currentOkiOptions.join('\n'),
-                frame: document.getElementById('frameInput').value || "0",
+                okiRaw: finalOkiRaw,
+                frame: document.getElementById('frameInput').value || "+0",
                 dmg: dmgValue,
                 drive: computeDriveCost(currentSteps),
                 primaryTag: autoPrimaryTag, 
