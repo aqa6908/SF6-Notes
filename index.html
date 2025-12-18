@@ -16,7 +16,7 @@
             overflow-y: scroll;
             -webkit-tap-highlight-color: transparent;
         }
-        
+
         .mono-font { font-family: 'Roboto Mono', monospace; }
         .fight-font { font-family: 'Teko', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
 
@@ -104,7 +104,7 @@
         }
 
         .drive-bar-lg {
-            width: 28px; height: 32px; /* 變大 */
+            width: 28px; height: 32px;
             transform: skewX(-12deg); 
             border: 1px solid #3f3f46;
             background-color: #27272a; 
@@ -121,21 +121,28 @@
         /* Sort Controls Styles */
         .sort-select {
             background-color: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
-            border-radius: 6px; padding: 6px 10px; font-size: 0.875rem; outline: none;
+            border-radius: 6px; padding: 6px 32px 6px 10px; font-size: 0.875rem; outline: none;
+            cursor: pointer; appearance: none;
+            font-family: inherit; /* 跟隨 body 字體 */
         }
-        .sort-btn-toggle {
+        .sort-select:hover { border-color: #52525b; }
+        
+        .sort-btn-icon {
             background-color: #27272a; border: 1px solid #3f3f46; color: #a1a1aa;
-            padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s;
-            display: flex; align-items: center; gap: 4px; font-size: 0.875rem; font-weight: bold;
+            padding: 6px; border-radius: 6px; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
         }
-        .sort-btn-toggle:hover { border-color: #a855f7; color: #fff; }
+        .sort-btn-icon:hover { border-color: #a855f7; color: #fff; background-color: #27272a; }
+        
+        .icon-rotate { transition: transform 0.3s ease; }
+        .rotate-180 { transform: rotate(180deg); }
     </style>
 </head>
 <body class="pb-20">
 
     <div id="navBar" class="hidden fixed top-0 w-full bg-zinc-900/95 backdrop-blur border-b border-zinc-700 p-3 z-50 flex justify-between items-center shadow-lg">
         <button onclick="history.back()" class="text-gray-400 hover:text-white flex items-center text-sm font-bold transition">
-            <span class="mr-1 text-xl">‹</span> 選角
+            <span class="mr-1 text-xl">‹</span> <span>選角</span>
         </button>
         <h1 class="absolute left-1/2 -translate-x-1/2 text-3xl font-bold text-white fight-font tracking-widest text-shadow" id="navTitle">RYU</h1>
         <button onclick="openBuilder()" id="addBtn" class="bg-purple-700 hover:bg-purple-600 text-white px-4 py-1.5 rounded text-sm font-bold shadow-[0_0_10px_rgba(168,85,247,0.5)] transition">
@@ -217,18 +224,20 @@
             </div>
         </div>
 
-        <div class="flex justify-between items-center mb-4 px-1 animate-[fadeIn_0.3s_ease-out]">
-            <div class="flex items-center gap-2">
-                <span class="text-xs text-zinc-500 font-bold tracking-wider">SORT BY</span>
-                <select id="sortSelect" class="sort-select">
-                    <option value="time">建立時間 (Date)</option>
-                    <option value="damage">傷害 (Damage)</option>
-                    <option value="cost">氣條消耗 (Cost)</option>
+        <div class="flex justify-end items-center mb-4 px-1 gap-2 animate-[fadeIn_0.3s_ease-out]">
+            <div class="relative">
+                <select id="sortSelect" class="sort-select pr-8">
+                    <option value="time">建立時間</option>
+                    <option value="damage">傷害數值</option>
+                    <option value="cost">氣條消耗</option>
                 </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zinc-500">
+                    <svg class="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                </div>
             </div>
-            <button id="sortDirBtn" class="sort-btn-toggle">
-                <span id="sortIcon">⬇</span>
-                <span id="sortLabel">降冪</span>
+
+            <button id="sortDirBtn" class="sort-btn-icon" title="切換順序">
+                <svg id="sortIconSvg" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-rotate rotate-180"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
             </button>
         </div>
 
@@ -352,7 +361,7 @@
         let activeFilterTags = [];
         let currentDriveCap = 6; 
         
-        // Sorting States (新增狀態)
+        // Sorting States
         let currentSort = 'time'; // time, damage, cost
         let isSortDesc = true;    // true = 降冪 (大->小/新->舊)
 
@@ -375,8 +384,7 @@
         // Sort UI Elements
         const sortSelect = document.getElementById('sortSelect');
         const sortDirBtn = document.getElementById('sortDirBtn');
-        const sortIcon = document.getElementById('sortIcon');
-        const sortLabel = document.getElementById('sortLabel');
+        const sortIconSvg = document.getElementById('sortIconSvg');
 
         const formatNumber = (num) => Number(num).toLocaleString('en-US');
 
@@ -420,9 +428,14 @@
         // 監聽排序方向按鈕
         sortDirBtn.addEventListener('click', () => {
             isSortDesc = !isSortDesc;
-            // 更新按鈕UI
-            sortIcon.textContent = isSortDesc ? '⬇' : '⬆';
-            sortLabel.textContent = isSortDesc ? '降冪' : '升冪';
+            
+            // 旋轉 ICON
+            if (isSortDesc) {
+                sortIconSvg.classList.add('rotate-180');
+            } else {
+                sortIconSvg.classList.remove('rotate-180');
+            }
+            
             renderNotes();
         });
 
@@ -574,7 +587,7 @@
                 });
             }
 
-            // Sorting Logic (NEW)
+            // Sorting Logic
             charNotes.sort((a, b) => {
                 let valA, valB;
 
